@@ -1,0 +1,215 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  """Example field: Users/1234567"""
+  _id: ID!
+
+  """Example field: 1234567"""
+  _key: ID!
+
+  """Example field: name@domain.com"""
+  email: String!
+
+  """Example field: username"""
+  username: String!
+
+  """Example field: name"""
+  name: String!
+
+  """Example field: surname"""
+  surname: String!
+
+  """Example field: Users/1234567"""
+  createdBy: ID!
+
+  """Example field: Users/1234567"""
+  updatedBy: ID!
+
+  """Example field: 2020-12-24T23:15:07.695Z"""
+  createdAt: String!
+
+  """Example field: 2020-12-24T23:15:07.695Z"""
+  updatedAt: String!
+}
+
+type Query {
+  findUsers(pagination: PaginationInput, sort: SortUserInput, filters: FilterUserInput): [User!]!
+  countUsers(filters: FilterUserInput): Int!
+  findUser(_key: ID!): User!
+}
+
+input PaginationInput {
+  """Example field: 100"""
+  offset: Int = 0
+
+  """Example field: 10"""
+  count: Int = 10
+}
+
+input SortUserInput {
+  """Example field: true"""
+  _key: Boolean
+
+  """Example field: name@domain.com"""
+  email: Boolean
+
+  """Example field: username"""
+  username: Boolean
+
+  """Example field: name"""
+  name: Boolean
+
+  """Example field: name"""
+  surname: Boolean
+
+  """Example field: name"""
+  createdBy: Boolean
+
+  """Example field: name"""
+  updatedBy: Boolean
+
+  """Example field: name"""
+  createdAt: Boolean
+
+  """Example field: name"""
+  updatedAt: Boolean
+
+  """Example field: name"""
+  sort: OperatorSort!
+}
+
+"""Support for sort operators."""
+enum OperatorSort {
+  ASC
+  DESC
+}
+
+input FilterUserInput {
+  """Example field: 1234567"""
+  _key: [FilterKeyInput!]
+
+  """Example field: [{value: "name@domain.com", operator: EQUAL}]"""
+  email: [FilterStringInput!]
+
+  """Example field: [{value: "username", operator: EQUAL}]"""
+  username: [FilterStringInput!]!
+
+  """Example field: [{value: "name", operator: EQUAL}]"""
+  name: [FilterStringInput!]!
+
+  """Example field: [{value: "surname", operator: EQUAL}]"""
+  surname: [FilterStringInput!]!
+
+  """Example field: [{value: "Users/1234567", operator: EQUAL}]"""
+  createdBy: [FilterStringInput!]!
+
+  """Example field: [{value: "Users/1234567", operator: EQUAL}]"""
+  updatedBy: [FilterStringInput!]!
+
+  """Example field: [{value: "Users/1234567", operator: EQUAL}]"""
+  createdAt: [FilterDatetimeInput!]!
+
+  """Example field: [{value: "2012-12-12T12:12:12.123Z", operator: EQUAL}]"""
+  updatedAt: [FilterDatetimeInput!]!
+
+  """Example field: [{value: "2012-12-12T12:12:12.123Z", operator: EQUAL}]"""
+  separator: OperatorBoolean!
+}
+
+input FilterKeyInput {
+  """Example field: 100"""
+  value: ID!
+
+  """Example field: EQUAL"""
+  operator: ComparisonOperatorString!
+}
+
+"""Comparison operators for string values."""
+enum ComparisonOperatorString {
+  EQUAL
+  DISTINCT
+  LESS
+  LESS_EQUAL
+  GREATER
+  GREATER_EQUAL
+  LIKE
+  NOT_LIKE
+  REGEX
+  NOT_REGEX
+}
+
+input FilterStringInput {
+  """Example field: string"""
+  value: String!
+
+  """Example field: EQUAL"""
+  operator: ComparisonOperatorString!
+}
+
+input FilterDatetimeInput {
+  """Example field: 2017-06-07T14:34:08.700Z"""
+  value: String!
+
+  """Example field: EQUAL"""
+  operator: ComparisonOperatorDatetime!
+}
+
+"""Comparison operators for datetime values."""
+enum ComparisonOperatorDatetime {
+  EQUAL
+  DISTINCT
+  LESS
+  LESS_EQUAL
+  GREATER
+  GREATER_EQUAL
+}
+
+"""Support for boolean operators."""
+enum OperatorBoolean {
+  AND
+  OR
+}
+
+type Mutation {
+  createUsers(create: [CreateUserInput!]!): [User!]!
+  updateUsers(update: [UpdateUserInput!]!): [User!]!
+  removeUsers(remove: [RemoveUserInput!]!): [User!]!
+}
+
+input CreateUserInput {
+  """Example field: 1234567"""
+  _key: ID
+
+  """Example field: name@domain.com"""
+  email: String!
+
+  """Example field: username"""
+  username: String!
+
+  """Example field: ygjgkj12g3kuh2k1h"""
+  password: String!
+}
+
+input UpdateUserInput {
+  """Example field: 1234567"""
+  _key: ID!
+
+  """Example field: name@domain.com"""
+  email: String
+
+  """Example field: username"""
+  username: String
+
+  """Example field: name"""
+  name: String
+
+  """Example field: surname"""
+  surname: String
+}
+
+input RemoveUserInput {
+  """Example field: Users/1234567"""
+  _id: ID!
+}

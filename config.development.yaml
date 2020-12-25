@@ -1,0 +1,12 @@
+app:
+  host: 'http://localhost'
+  port: 3000
+
+db:
+  arangodb:
+    host: 'http://localhost'
+    port: 8529
+    name: 'app_nest_dev'
+    username: 'app_nest_dev'
+    password: 'secret'
+    certs: []
