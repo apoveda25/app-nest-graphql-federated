@@ -78,7 +78,7 @@ export class UsersService {
   async findOne(_key: string): Promise<User | unknown> {
     const cursor = await this.db.query(aql`
       FOR doc IN ${this.collection}
-      FILTER doc._key == ${_key}
+      FILTER doc._key == ${_key} || doc._id == ${_key}
       RETURN doc
     `);
 

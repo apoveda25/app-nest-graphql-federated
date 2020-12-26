@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { GraphQLModule } from '@nestjs/graphql';
+import { GraphQLFederationModule } from '@nestjs/graphql';
 import { UsersModule } from './users/users.module';
 import { CommonsModule } from './commons/commons.module';
 import { validate } from './config/validation';
@@ -19,7 +19,7 @@ import configuration from './config/configuration';
       encoding: 'UTF-8',
       validate,
     }),
-    GraphQLModule.forRoot({
+    GraphQLFederationModule.forRoot({
       autoSchemaFile: 'schema.graphql',
       context: ({ req }) => ({
         user: {

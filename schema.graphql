@@ -2,6 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+directive @key(fields: String!) on OBJECT | INTERFACE
+
+directive @extends on OBJECT | INTERFACE
+
+directive @external on OBJECT | FIELD_DEFINITION
+
+directive @requires(fields: String!) on FIELD_DEFINITION
+
+directive @provides(fields: String!) on FIELD_DEFINITION
+
 type User {
   """Example field: Users/1234567"""
   _id: ID!
@@ -27,10 +37,10 @@ type User {
   """Example field: Users/1234567"""
   updatedBy: ID!
 
-  """Example field: 2020-12-26T21:18:26.980Z"""
+  """Example field: 2020-12-26T21:41:26.318Z"""
   createdAt: String!
 
-  """Example field: 2020-12-26T21:18:26.980Z"""
+  """Example field: 2020-12-26T21:41:26.319Z"""
   updatedAt: String!
 }
 

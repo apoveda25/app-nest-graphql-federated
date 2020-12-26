@@ -1,5 +1,6 @@
 import { ParseArrayPipe } from '@nestjs/common';
 import {
+  ResolveReference,
   Resolver,
   Query,
   Mutation,
@@ -96,5 +97,10 @@ export class UsersResolver {
     remove: RemoveUserInput[],
   ) {
     return this.usersService.remove(remove);
+  }
+
+  @ResolveReference()
+  resolveReference(reference: { __typename: string; _id: string }) {
+    return this.usersService.findOne(reference._id);
   }
 }
