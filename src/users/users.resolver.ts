@@ -1,4 +1,4 @@
-import { ParseArrayPipe, UsePipes } from '@nestjs/common';
+import { ParseArrayPipe } from '@nestjs/common';
 import {
   Resolver,
   Query,
@@ -10,6 +10,7 @@ import {
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { CreateUserHash } from './dto/create-user-hash';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { RemoveUserInput } from './dto/remove-user.input';
@@ -32,8 +33,9 @@ export class UsersResolver {
         type: () => [CreateUserInput],
       },
       new ParseArrayPipe({ items: CreateUserInput }),
+      new ParseArrayPipe({ items: CreateUserHash }),
     )
-    create: CreateUserInput[],
+    create: CreateUserHash[],
     @Context('user') user: { _id: string; scopes: string[] },
   ) {
     return this.usersService.create(

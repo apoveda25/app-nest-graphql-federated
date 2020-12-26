@@ -27,10 +27,10 @@ type User {
   """Example field: Users/1234567"""
   updatedBy: ID!
 
-  """Example field: 2020-12-26T16:53:18.832Z"""
+  """Example field: 2020-12-26T21:18:26.980Z"""
   createdAt: String!
 
-  """Example field: 2020-12-26T16:53:18.832Z"""
+  """Example field: 2020-12-26T21:18:26.980Z"""
   updatedAt: String!
 }
 

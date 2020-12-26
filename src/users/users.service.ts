@@ -5,7 +5,7 @@ import type { DocumentCollection } from 'arangojs/collection';
 import { FilterUserInput } from './dto/filter-user.input';
 import { SortUserInput } from './dto/sort-user.input';
 import { PaginationInput } from '../commons/pagination.input';
-import { CreateUserInput } from './dto/create-user.input';
+import { CreateUserHash } from './dto/create-user-hash';
 import { UpdateUserInput } from './dto/update-user.input';
 import { RemoveUserInput } from './dto/remove-user.input';
 import { User } from './entities/user.entity';
@@ -25,7 +25,7 @@ export class UsersService {
     this.collection = this.db.collection<User[]>('Users');
   }
 
-  public async create(createUsersInput: CreateUserInput[]): Promise<User[]> {
+  public async create(createUsersInput: CreateUserHash[]): Promise<User[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
