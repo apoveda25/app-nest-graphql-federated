@@ -34,4 +34,10 @@ export class CreateUserInput {
 
   @HideField()
   updatedBy = '';
+
+  @HideField()
+  createdAt = new Date().toISOString();
+
+  @HideField()
+  updatedAt = '';
 }

@@ -4,8 +4,8 @@ app:
 
 db:
   arangodb:
-    host: 'http://localhost'
-    port: 8529
+    urls:
+    - 'http://localhost:8529'
     name: 'app_nest_dev'
     username: 'app_nest_dev'
     password: 'secret'

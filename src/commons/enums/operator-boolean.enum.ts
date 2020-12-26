@@ -1,8 +1,8 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum OperatorBoolean {
-  AND,
-  OR,
+  AND = 'AND',
+  OR = 'OR',
 }
 
 registerEnumType(OperatorBoolean, {

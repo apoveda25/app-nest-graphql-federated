@@ -41,6 +41,8 @@ export class UpdateUserInput {
   surname?: string;
 
   @HideField()
-  @IsString()
   updatedBy: string;
+
+  @HideField()
+  updatedAt = new Date().toISOString();
 }

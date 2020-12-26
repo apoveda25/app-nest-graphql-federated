@@ -1,8 +1,8 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum ComparisonOperatorBoolean {
-  EQUAL,
-  DISTINCT,
+  EQUAL = '==',
+  DISTINCT = '!=',
 }
 
 registerEnumType(ComparisonOperatorBoolean, {

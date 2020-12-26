@@ -27,10 +27,10 @@ type User {
   """Example field: Users/1234567"""
   updatedBy: ID!
 
-  """Example field: 2020-12-24T23:15:07.695Z"""
+  """Example field: 2020-12-26T16:53:18.832Z"""
   createdAt: String!
 
-  """Example field: 2020-12-24T23:15:07.695Z"""
+  """Example field: 2020-12-26T16:53:18.832Z"""
   updatedAt: String!
 }
 
@@ -94,28 +94,28 @@ input FilterUserInput {
   email: [FilterStringInput!]
 
   """Example field: [{value: "username", operator: EQUAL}]"""
-  username: [FilterStringInput!]!
+  username: [FilterStringInput!]
 
   """Example field: [{value: "name", operator: EQUAL}]"""
-  name: [FilterStringInput!]!
+  name: [FilterStringInput!]
 
   """Example field: [{value: "surname", operator: EQUAL}]"""
-  surname: [FilterStringInput!]!
+  surname: [FilterStringInput!]
 
   """Example field: [{value: "Users/1234567", operator: EQUAL}]"""
-  createdBy: [FilterStringInput!]!
+  createdBy: [FilterStringInput!]
 
   """Example field: [{value: "Users/1234567", operator: EQUAL}]"""
-  updatedBy: [FilterStringInput!]!
+  updatedBy: [FilterStringInput!]
 
   """Example field: [{value: "Users/1234567", operator: EQUAL}]"""
-  createdAt: [FilterDatetimeInput!]!
+  createdAt: [FilterDatetimeInput!]
 
   """Example field: [{value: "2012-12-12T12:12:12.123Z", operator: EQUAL}]"""
-  updatedAt: [FilterDatetimeInput!]!
+  updatedAt: [FilterDatetimeInput!]
 
-  """Example field: [{value: "2012-12-12T12:12:12.123Z", operator: EQUAL}]"""
-  separator: OperatorBoolean!
+  """Example field: ASC"""
+  separator: OperatorBoolean
 }
 
 input FilterKeyInput {

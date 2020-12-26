@@ -25,6 +25,7 @@ export class FilterUserInput {
 
   @Field(() => [FilterStringInput], {
     description: 'Example field: [{value: "username", operator: EQUAL}]',
+    nullable: true,
   })
   @IsArray()
   @IsOptional()
@@ -32,6 +33,7 @@ export class FilterUserInput {
 
   @Field(() => [FilterStringInput], {
     description: 'Example field: [{value: "name", operator: EQUAL}]',
+    nullable: true,
   })
   @IsArray()
   @IsOptional()
@@ -39,6 +41,7 @@ export class FilterUserInput {
 
   @Field(() => [FilterStringInput], {
     description: 'Example field: [{value: "surname", operator: EQUAL}]',
+    nullable: true,
   })
   @IsArray()
   @IsOptional()
@@ -46,6 +49,7 @@ export class FilterUserInput {
 
   @Field(() => [FilterStringInput], {
     description: 'Example field: [{value: "Users/1234567", operator: EQUAL}]',
+    nullable: true,
   })
   @IsArray()
   @IsOptional()
@@ -53,6 +57,7 @@ export class FilterUserInput {
 
   @Field(() => [FilterStringInput], {
     description: 'Example field: [{value: "Users/1234567", operator: EQUAL}]',
+    nullable: true,
   })
   @IsArray()
   @IsOptional()
@@ -60,6 +65,7 @@ export class FilterUserInput {
 
   @Field(() => [FilterDatetimeInput], {
     description: 'Example field: [{value: "Users/1234567", operator: EQUAL}]',
+    nullable: true,
   })
   @IsArray()
   @IsOptional()
@@ -68,14 +74,15 @@ export class FilterUserInput {
   @Field(() => [FilterDatetimeInput], {
     description:
       'Example field: [{value: "2012-12-12T12:12:12.123Z", operator: EQUAL}]',
+    nullable: true,
   })
   @IsArray()
   @IsOptional()
   updatedAt?: FilterDatetimeInput[];
 
   @Field(() => OperatorBoolean, {
-    description:
-      'Example field: [{value: "2012-12-12T12:12:12.123Z", operator: EQUAL}]',
+    description: 'Example field: ASC',
+    nullable: true,
   })
   @IsString()
   separator: OperatorBoolean;

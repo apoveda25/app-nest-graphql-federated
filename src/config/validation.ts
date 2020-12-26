@@ -6,6 +6,7 @@ import {
   IsString,
   IsArray,
   ValidateNested,
+  ArrayContains,
 } from 'class-validator';
 
 class APP {
@@ -17,11 +18,8 @@ class APP {
 }
 
 class ArangoDB {
-  @IsUrl()
-  host: string;
-
-  @IsPort()
-  port: number;
+  @ArrayContains([IsUrl])
+  url: string[];
 
   @IsString()
   name: string;
