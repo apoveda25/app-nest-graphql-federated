@@ -8,10 +8,11 @@ import configuration from './config/configuration';
 import { validate } from './config/validation';
 import { DatabaseModule } from './database/database.module';
 import { AuthorizationModule } from './authorization/authorization.module';
-import { ScopesGuard } from './authorization/scopes.guard';
+import { PermissionsGuard } from './authorization/permissions.guard';
 import { FederationModule } from './federation/federation.module';
 import { FederationConfigService } from './federation/federation-config.service';
 import { RolesModule } from './roles/roles.module';
+import { ScopesModule } from './scopes/scopes.module';
 
 @Module({
   imports: [
@@ -31,11 +32,12 @@ import { RolesModule } from './roles/roles.module';
     AuthorizationModule,
     FederationModule,
     RolesModule,
+    ScopesModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: ScopesGuard,
+      useClass: PermissionsGuard,
     },
   ],
 })

@@ -24,7 +24,9 @@ export class UpdateRoleInput extends PartialType(CreateRoleInput) {
   active?: boolean;
 
   @HideField()
-  updatedBy = '';
+  @Matches(/^Roles\/[\w]+$/)
+  @IsString()
+  updatedBy: string;
 
   @HideField()
   updatedAt = new Date().toISOString();

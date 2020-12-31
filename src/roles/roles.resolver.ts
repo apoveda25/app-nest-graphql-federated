@@ -10,8 +10,8 @@ import { PaginationInput } from 'src/commons/pagination.input';
 import { RemoveRoleInput } from './dto/remove-role.input';
 import { RolesCreatePipe } from './pipes/roles-create.pipe';
 import { RolesUpdatePipe } from './pipes/roles-update.pipe';
-import { Scopes } from '../authorization/scopes.decorator';
-import { Scope } from '../authorization/scopes.enum';
+import { Permissions } from '../authorization/permission.decorator';
+import { Permission } from '../authorization/permission';
 
 @Resolver(() => Role)
 export class RolesResolver {
@@ -19,7 +19,7 @@ export class RolesResolver {
 
   @Mutation(() => [Role])
   @UsePipes(RolesCreatePipe)
-  @Scopes(Scope.RolesCreate)
+  @Permissions(Permission.RolesCreate)
   createRoles(
     @Args(
       {
@@ -34,7 +34,7 @@ export class RolesResolver {
   }
 
   @Query(() => [Role])
-  @Scopes(Scope.RolesFindAll)
+  @Permissions(Permission.RolesFindAll)
   findAllRoles(
     @Args('filters', { type: () => FilterRoleInput, nullable: true })
     filters?: FilterRoleInput,
@@ -47,7 +47,7 @@ export class RolesResolver {
   }
 
   @Query(() => Int)
-  @Scopes(Scope.RolesCount)
+  @Permissions(Permission.RolesCount)
   countAllRoles(
     @Args('filters', { type: () => FilterRoleInput, nullable: true })
     filters?: FilterRoleInput,
@@ -56,14 +56,14 @@ export class RolesResolver {
   }
 
   @Query(() => Role)
-  @Scopes(Scope.RolesFindOne)
+  @Permissions(Permission.RolesFindOne)
   findOneRole(@Args('_key', { type: () => ID }) _key: string) {
     return this.rolesService.findOne(_key);
   }
 
-  @Mutation(() => Role)
+  @Mutation(() => [Role])
   @UsePipes(RolesUpdatePipe)
-  @Scopes(Scope.RolesUpdate)
+  @Permissions(Permission.RolesUpdate)
   updateRole(
     @Args(
       { name: 'update', type: () => [UpdateRoleInput] },
@@ -74,8 +74,8 @@ export class RolesResolver {
     return this.rolesService.update(update);
   }
 
-  @Mutation(() => Role)
-  @Scopes(Scope.RolesRemove)
+  @Mutation(() => [Role])
+  @Permissions(Permission.RolesRemove)
   removeRole(
     @Args(
       { name: 'remove', type: () => [RemoveRoleInput] },

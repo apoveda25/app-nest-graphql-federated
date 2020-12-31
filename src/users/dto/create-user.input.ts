@@ -56,7 +56,9 @@ export class CreateUserInput {
   active: boolean;
 
   @HideField()
-  createdBy = '';
+  @Matches(/^Users\/[\w]+$/)
+  @IsString()
+  createdBy: string;
 
   @HideField()
   updatedBy = '';

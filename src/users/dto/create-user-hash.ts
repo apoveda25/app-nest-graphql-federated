@@ -41,6 +41,8 @@ export class CreateUserHash {
   active: boolean;
 
   @IsString()
+  @Matches(/^Users\/[\w]+$/)
+  @IsString()
   createdBy: string;
 
   @IsString()

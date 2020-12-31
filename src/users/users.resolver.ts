@@ -17,8 +17,8 @@ import { RemoveUserInput } from './dto/remove-user.input';
 import { FilterUserInput } from './dto/filter-user.input';
 import { SortUserInput } from './dto/sort-user.input';
 import { PaginationInput } from '../commons/pagination.input';
-import { Scopes } from '../authorization/scopes.decorator';
-import { Scope } from '../authorization/scopes.enum';
+import { Permissions } from '../authorization/permission.decorator';
+import { Permission } from '../authorization/permission';
 import { UsersCreatePipe } from './pipes/users-create.pipe';
 import { UsersUpdatePipe } from './pipes/users-update.pipe';
 
@@ -28,7 +28,7 @@ export class UsersResolver {
 
   @Mutation(() => [User])
   @UsePipes(UsersCreatePipe)
-  @Scopes(Scope.UsersCreate)
+  @Permissions(Permission.UsersCreate)
   createUsers(
     @Args(
       {
@@ -44,7 +44,7 @@ export class UsersResolver {
   }
 
   @Query(() => [User])
-  @Scopes(Scope.UsersFindAll)
+  @Permissions(Permission.UsersFindAll)
   findAllUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
     filters?: FilterUserInput,
@@ -57,7 +57,7 @@ export class UsersResolver {
   }
 
   @Query(() => Int)
-  @Scopes(Scope.UsersCount)
+  @Permissions(Permission.UsersCount)
   countAllUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
     filters?: FilterUserInput,
@@ -66,14 +66,14 @@ export class UsersResolver {
   }
 
   @Query(() => User)
-  @Scopes(Scope.UsersFindOne)
+  @Permissions(Permission.UsersFindOne)
   findOneUser(@Args('_key', { type: () => ID }) _key: string) {
     return this.usersService.findOne(_key);
   }
 
   @Mutation(() => [User])
   @UsePipes(UsersUpdatePipe)
-  @Scopes(Scope.UsersUpdate)
+  @Permissions(Permission.UsersUpdate)
   updateUsers(
     @Args(
       { name: 'update', type: () => [UpdateUserInput] },
@@ -85,7 +85,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => [User])
-  @Scopes(Scope.UsersRemove)
+  @Permissions(Permission.UsersRemove)
   removeUsers(
     @Args(
       { name: 'remove', type: () => [RemoveUserInput] },

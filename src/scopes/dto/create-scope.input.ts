@@ -1,8 +1,8 @@
-import { InputType, ID, Field, HideField } from '@nestjs/graphql';
+import { InputType, Field, ID, HideField } from '@nestjs/graphql';
 import { IsBoolean, IsString, Matches } from 'class-validator';
 
 @InputType()
-export class CreateRoleInput {
+export class CreateScopeInput {
   @Field(() => ID, { nullable: true })
   _key?: string;
 
@@ -20,7 +20,7 @@ export class CreateRoleInput {
   active: boolean;
 
   @HideField()
-  @Matches(/^Roles\/[\w]+$/)
+  @Matches(/^Scopes\/[\w]+$/)
   @IsString()
   createdBy: string;
 

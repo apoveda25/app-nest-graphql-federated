@@ -1,4 +1,4 @@
-export enum Scope {
+export enum Permission {
   UsersCreate = 'users_create',
   UsersUpdate = 'users_update',
   UsersRemove = 'users_remove',
@@ -12,4 +12,11 @@ export enum Scope {
   RolesFindOne = 'roles_find_one',
   RolesFindAll = 'roles_find_all',
   RolesCount = 'roles_count',
+
+  ScopesCreate = 'scopes_create',
+  ScopesUpdate = 'scopes_update',
+  ScopesRemove = 'scopes_remove',
+  ScopesFindOne = 'scopes_find_one',
+  ScopesFindAll = 'scopes_find_all',
+  ScopesCount = 'scopes_count',
 }

@@ -32,7 +32,9 @@ export class UpdateUserInput {
   surname?: string;
 
   @HideField()
-  updatedBy = '';
+  @Matches(/^Users\/[\w]+$/)
+  @IsString()
+  updatedBy: string;
 
   @HideField()
   updatedAt = new Date().toISOString();
