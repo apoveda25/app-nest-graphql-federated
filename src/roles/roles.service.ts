@@ -1,19 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Database } from 'arangojs/database';
-import { aql } from 'arangojs/aql';
-import type { DocumentCollection } from 'arangojs/collection';
-import { FilterUserInput } from './dto/filter-user.input';
-import { SortUserInput } from './dto/sort-user.input';
-import { PaginationInput } from '../commons/pagination.input';
-import { CreateUserHash } from './dto/create-user-hash';
-import { UpdateUserInput } from './dto/update-user.input';
-import { RemoveUserInput } from './dto/remove-user.input';
-import { User } from './entities/user.entity';
+import { aql, Database } from 'arangojs';
+import { DocumentCollection } from 'arangojs/collection';
+import { PaginationInput } from 'src/commons/pagination.input';
 import { Connection } from '../database/connection';
 import { QueryParser } from '../database/query-parser';
+import { CreateRoleInput } from './dto/create-role.input';
+import { FilterRoleInput } from './dto/filter-role.input';
+import { RemoveRoleInput } from './dto/remove-role.input';
+import { SortRoleInput } from './dto/sort-role.input';
+import { UpdateRoleInput } from './dto/update-role.input';
+import { Role } from './entities/role.entity';
 
 @Injectable()
-export class UsersService {
+export class RolesService {
   private db: Database;
   private collection: DocumentCollection;
 
@@ -22,16 +21,16 @@ export class UsersService {
     private queryParser: QueryParser,
   ) {
     this.db = this.connection.db;
-    this.collection = this.db.collection<User[]>('Users');
+    this.collection = this.db.collection<Role[]>('Roles');
   }
 
-  async create(createUsersInput: CreateUserHash[]): Promise<User[]> {
+  async create(createRolesInput: CreateRoleInput[]) {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.saveAll(createUsersInput, {
+      this.collection.saveAll(createRolesInput, {
         returnNew: true,
       }),
     );
@@ -46,10 +45,10 @@ export class UsersService {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: FilterUserInput;
-    sort?: SortUserInput;
+    filters?: FilterRoleInput;
+    sort?: SortRoleInput;
     pagination?: PaginationInput;
-  }): Promise<User[]> {
+  }): Promise<Role[]> {
     const cursor = await this.db.query(aql`
       FOR doc IN ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filters))}
@@ -75,7 +74,7 @@ export class UsersService {
     return data[0];
   }
 
-  async findOne(_key: string): Promise<User | unknown> {
+  async findOne(_key: string): Promise<Role | unknown> {
     const cursor = await this.db.query(aql`
       FOR doc IN ${this.collection}
       FILTER doc._key == ${_key} || doc._id == ${_key}
@@ -87,13 +86,13 @@ export class UsersService {
     return docs[0] || {};
   }
 
-  async update(updateUsersInput: UpdateUserInput[]): Promise<User[]> {
+  async update(updateRolesInput: UpdateRoleInput[]): Promise<Role[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.updateAll(updateUsersInput, { returnNew: true }),
+      this.collection.updateAll(updateRolesInput, { returnNew: true }),
     );
 
     await trx.commit();
@@ -101,7 +100,7 @@ export class UsersService {
     return docs.map((doc) => doc.new);
   }
 
-  async remove(removeUsersInput: RemoveUserInput[]): Promise<User[]> {
+  async remove(removeUsersInput: RemoveRoleInput[]): Promise<Role[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });

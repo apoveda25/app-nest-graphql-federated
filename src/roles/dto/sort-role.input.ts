@@ -3,26 +3,11 @@ import { IsOptional, IsBoolean, IsString } from 'class-validator';
 import { OperatorSort } from '../../commons/enums/operator-sort.enum';
 
 @InputType()
-export class SortUserInput {
+export class SortRoleInput {
   @Field(() => Boolean, { nullable: true })
   @IsBoolean()
   @IsOptional()
   _key?: boolean;
-
-  @Field(() => Boolean, { nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  email?: boolean;
-
-  @Field(() => Boolean, { nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  emailActive?: boolean;
-
-  @Field(() => Boolean, { nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  username?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   @IsBoolean()
@@ -32,7 +17,7 @@ export class SortUserInput {
   @Field(() => Boolean, { nullable: true })
   @IsBoolean()
   @IsOptional()
-  surname?: boolean;
+  description?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   @IsBoolean()

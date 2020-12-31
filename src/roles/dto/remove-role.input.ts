@@ -2,9 +2,9 @@ import { InputType, Field, ID } from '@nestjs/graphql';
 import { IsString, Matches } from 'class-validator';
 
 @InputType()
-export class RemoveUserInput {
+export class RemoveRoleInput {
   @Field(() => ID)
-  @Matches(/^Users\/[\w]+$/)
+  @Matches(/^Roles\/[\w]+$/)
   @IsString()
   _id: string;
 }

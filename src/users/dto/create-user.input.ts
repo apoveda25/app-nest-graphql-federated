@@ -1,24 +1,46 @@
 import { InputType, ID, Field, HideField } from '@nestjs/graphql';
-import { IsString, IsEmail, Matches, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  Matches,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
+
+const emailCodeGenerate = (lenght: number) => {
+  let code = '';
+
+  for (let i = 0; i < lenght; i++) {
+    code += `${Math.floor(Math.random() * 10)}`;
+  }
+
+  return code;
+};
 
 @InputType()
 export class CreateUserInput {
-  @Field(() => ID, { description: 'Example field: 1234567', nullable: true })
+  @Field(() => ID, { nullable: true })
   @Matches(/^[\w]+$/)
   @IsOptional()
   _key?: string;
 
-  @Field(() => String, { description: 'Example field: name@domain.com' })
+  @Field(() => String)
   @IsEmail()
   @IsString()
   email: string;
 
-  @Field(() => String, { description: 'Example field: username' })
+  @HideField()
+  emailActive = false;
+
+  @HideField()
+  emailCode = emailCodeGenerate(6);
+
+  @Field(() => String)
   @Matches(/^[\w]+$/)
   @IsString()
   username: string;
 
-  @Field(() => String, { description: 'Example field: ygjgkj12g3kuh2k1h' })
+  @Field(() => String)
   @Matches(/^[\w.!@#$%^&*_+='",:;|<>]{8,20}$/)
   @IsString()
   password: string;
@@ -28,6 +50,10 @@ export class CreateUserInput {
 
   @HideField()
   surname = '';
+
+  @Field(() => Boolean)
+  @IsBoolean()
+  active: boolean;
 
   @HideField()
   createdBy = '';

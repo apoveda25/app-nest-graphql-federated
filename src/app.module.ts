@@ -11,6 +11,7 @@ import { AuthorizationModule } from './authorization/authorization.module';
 import { ScopesGuard } from './authorization/scopes.guard';
 import { FederationModule } from './federation/federation.module';
 import { FederationConfigService } from './federation/federation-config.service';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { FederationConfigService } from './federation/federation-config.service'
     DatabaseModule,
     AuthorizationModule,
     FederationModule,
+    RolesModule,
   ],
   providers: [
     {

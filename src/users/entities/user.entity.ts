@@ -1,46 +1,54 @@
-import { Directive, ObjectType, Field, ID, HideField } from '@nestjs/graphql';
+import {
+  Directive,
+  ObjectType,
+  Field,
+  ID,
+  HideField,
+  Int,
+} from '@nestjs/graphql';
 
 @ObjectType()
 @Directive('@key(fields: "_id")')
 export class User {
-  @Field(() => ID, { description: 'Example field: Users/1234567' })
+  @Field(() => ID)
   _id: string;
 
-  @Field(() => ID, { description: 'Example field: 1234567' })
+  @Field(() => ID)
   _key: string;
 
-  @Field(() => String, { description: 'Example field: name@domain.com' })
+  @Field(() => String)
   email: string;
 
-  @Field(() => String, { description: 'Example field: username' })
+  @Field(() => Boolean)
+  emailActive: boolean;
+
+  @Field(() => String)
+  emailCode: string;
+
+  @Field(() => String)
   username: string;
 
   @HideField()
   password: string;
 
-  @Field(() => String, { description: 'Example field: name' })
+  @Field(() => String)
   name: string;
 
-  @Field(() => String, { description: 'Example field: surname' })
+  @Field(() => String)
   surname: string;
 
-  @Field(() => ID, {
-    description: 'Example field: Users/1234567',
-  })
+  @Field(() => Boolean)
+  active: boolean;
+
+  @Field(() => ID)
   createdBy: string;
 
-  @Field(() => ID, {
-    description: 'Example field: Users/1234567',
-  })
+  @Field(() => ID)
   updatedBy: string;
 
-  @Field(() => String, {
-    description: `Example field: ${new Date().toISOString()}`,
-  })
+  @Field(() => String)
   createdAt: string;
 
-  @Field(() => String, {
-    description: `Example field: ${new Date().toISOString()}`,
-  })
+  @Field(() => String)
   updatedAt: string;
 }

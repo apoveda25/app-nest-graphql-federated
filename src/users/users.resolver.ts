@@ -1,11 +1,10 @@
-import { ParseArrayPipe } from '@nestjs/common';
+import { ParseArrayPipe, UsePipes } from '@nestjs/common';
 import {
   ResolveReference,
   Resolver,
   Query,
   Mutation,
   Args,
-  Context,
   ID,
   Int,
 } from '@nestjs/graphql';
@@ -19,13 +18,16 @@ import { FilterUserInput } from './dto/filter-user.input';
 import { SortUserInput } from './dto/sort-user.input';
 import { PaginationInput } from '../commons/pagination.input';
 import { Scopes } from '../authorization/scopes.decorator';
-import { Scope } from 'src/authorization/scopes.enum';
+import { Scope } from '../authorization/scopes.enum';
+import { UsersCreatePipe } from './pipes/users-create.pipe';
+import { UsersUpdatePipe } from './pipes/users-update.pipe';
 
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Mutation(() => [User])
+  @UsePipes(UsersCreatePipe)
   @Scopes(Scope.UsersCreate)
   createUsers(
     @Args(
@@ -37,16 +39,13 @@ export class UsersResolver {
       new ParseArrayPipe({ items: CreateUserHash }),
     )
     create: CreateUserHash[],
-    @Context('user') user: { _id: string; scopes: string[] },
   ) {
-    return this.usersService.create(
-      create.map((el) => ({ ...el, createdBy: user._id })),
-    );
+    return this.usersService.create(create);
   }
 
-  @Query(() => [User], { name: 'findUsers' })
+  @Query(() => [User])
   @Scopes(Scope.UsersFindAll)
-  findAll(
+  findAllUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
     filters?: FilterUserInput,
     @Args('sort', { type: () => SortUserInput, nullable: true })
@@ -57,22 +56,23 @@ export class UsersResolver {
     return this.usersService.findAll({ filters, sort, pagination });
   }
 
-  @Query(() => Int, { name: 'countUsers' })
+  @Query(() => Int)
   @Scopes(Scope.UsersCount)
-  count(
+  countAllUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
     filters?: FilterUserInput,
   ) {
     return this.usersService.countAll(filters);
   }
 
-  @Query(() => User, { name: 'findUser' })
+  @Query(() => User)
   @Scopes(Scope.UsersFindOne)
-  findOne(@Args('_key', { type: () => ID }) _key: string) {
+  findOneUser(@Args('_key', { type: () => ID }) _key: string) {
     return this.usersService.findOne(_key);
   }
 
   @Mutation(() => [User])
+  @UsePipes(UsersUpdatePipe)
   @Scopes(Scope.UsersUpdate)
   updateUsers(
     @Args(
@@ -80,11 +80,8 @@ export class UsersResolver {
       new ParseArrayPipe({ items: UpdateUserInput }),
     )
     update: UpdateUserInput[],
-    @Context('user') user: { _id: string; scopes: string[] },
   ) {
-    return this.usersService.update(
-      update.map((el) => ({ ...el, updatedBy: user._id })),
-    );
+    return this.usersService.update(update);
   }
 
   @Mutation(() => [User])

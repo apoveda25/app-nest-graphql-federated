@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
+import { IsBoolean } from 'class-validator';
 
 export class CreateUserHash {
   @Matches(/^[\w]+$/)
@@ -16,6 +17,12 @@ export class CreateUserHash {
   @IsEmail()
   @IsString()
   email: string;
+
+  @IsBoolean()
+  emailActive: boolean;
+
+  @Matches(/^[\d]{6}$/)
+  emailCode: string;
 
   @Matches(/^[\w]+$/)
   @IsString()
@@ -29,6 +36,9 @@ export class CreateUserHash {
 
   @IsString()
   surname: string;
+
+  @IsBoolean()
+  active: boolean;
 
   @IsString()
   createdBy: string;
