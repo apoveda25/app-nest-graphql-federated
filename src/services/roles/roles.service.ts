@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { aql, Database } from 'arangojs';
 import { DocumentCollection } from 'arangojs/collection';
-import { Connection } from '../database/connection';
-import { QueryParser } from '../database/query-parser';
-import { CreateScopeInput } from './dto/create-scope.input';
-import { UpdateScopeInput } from './dto/update-scope.input';
-import { Scope } from './entities/scope.entity';
-import { FilterScopeInput } from './dto/filter-scope.input';
-import { SortScopeInput } from './dto/sort-scope.input';
-import { PaginationInput } from '../commons/pagination.input';
-import { RemoveScopeInput } from './dto/remove-scope.input';
+import { PaginationInput } from 'src/commons/pagination.input';
+import { Connection } from '../../database/connection';
+import { QueryParser } from '../../database/query-parser';
+import { CreateRoleInput } from './dto/create-role.input';
+import { FilterRoleInput } from './dto/filter-role.input';
+import { RemoveRoleInput } from './dto/remove-role.input';
+import { SortRoleInput } from './dto/sort-role.input';
+import { UpdateRoleInput } from './dto/update-role.input';
+import { Role } from './entities/role.entity';
 
 @Injectable()
-export class ScopesService {
+export class RolesService {
   private db: Database;
   private collection: DocumentCollection;
 
@@ -21,16 +21,16 @@ export class ScopesService {
     private queryParser: QueryParser,
   ) {
     this.db = this.connection.db;
-    this.collection = this.db.collection<Scope[]>('Scopes');
+    this.collection = this.db.collection<Role[]>('Roles');
   }
 
-  async create(createScopesInput: CreateScopeInput[]) {
+  async create(createRolesInput: CreateRoleInput[]) {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.saveAll(createScopesInput, {
+      this.collection.saveAll(createRolesInput, {
         returnNew: true,
       }),
     );
@@ -45,10 +45,10 @@ export class ScopesService {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: FilterScopeInput;
-    sort?: SortScopeInput;
+    filters?: FilterRoleInput;
+    sort?: SortRoleInput;
     pagination?: PaginationInput;
-  }): Promise<Scope[]> {
+  }): Promise<Role[]> {
     const cursor = await this.db.query(aql`
       FOR doc IN ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filters))}
@@ -74,7 +74,7 @@ export class ScopesService {
     return data[0];
   }
 
-  async findOne(_key: string): Promise<Scope | unknown> {
+  async findOne(_key: string): Promise<Role | unknown> {
     const cursor = await this.db.query(aql`
       FOR doc IN ${this.collection}
       FILTER doc._key == ${_key} || doc._id == ${_key}
@@ -86,13 +86,13 @@ export class ScopesService {
     return docs[0] || {};
   }
 
-  async update(updateScopesInput: UpdateScopeInput[]): Promise<Scope[]> {
+  async update(updateRolesInput: UpdateRoleInput[]): Promise<Role[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.updateAll(updateScopesInput, { returnNew: true }),
+      this.collection.updateAll(updateRolesInput, { returnNew: true }),
     );
 
     await trx.commit();
@@ -100,14 +100,14 @@ export class ScopesService {
     return docs.map((doc) => doc.new);
   }
 
-  async remove(removeScopesInput: RemoveScopeInput[]): Promise<Scope[]> {
+  async remove(removeRolesInput: RemoveRoleInput[]): Promise<Role[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
       this.db.query(aql`
-        FOR item IN ${removeScopesInput}
+        FOR item IN ${removeRolesInput}
         LET doc = DOCUMENT(item._id)
         REMOVE doc IN ${this.collection}
         RETURN OLD

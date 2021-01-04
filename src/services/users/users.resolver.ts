@@ -16,9 +16,9 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { RemoveUserInput } from './dto/remove-user.input';
 import { FilterUserInput } from './dto/filter-user.input';
 import { SortUserInput } from './dto/sort-user.input';
-import { PaginationInput } from '../commons/pagination.input';
-import { Permissions } from '../authorization/permission.decorator';
-import { Permission } from '../authorization/permission';
+import { PaginationInput } from '../../commons/pagination.input';
+import { Permissions } from '../../authorization/permission.decorator';
+import { Permission } from '../../authorization/permission';
 import { UsersCreatePipe } from './pipes/users-create.pipe';
 import { UsersUpdatePipe } from './pipes/users-update.pipe';
 

@@ -1,32 +1,17 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { IsOptional, IsArray, IsString } from 'class-validator';
-import { FilterKeyInput } from '../../commons/filter-key.input';
-import { FilterStringInput } from '../../commons/filter-string.input';
-import { FilterDatetimeInput } from '../../commons/filter-datetime.input';
-import { OperatorBoolean } from '../../commons/enums/operator-boolean.enum';
-import { FilterBooleanInput } from '../../commons/filter-boolean.input';
+import { Field, InputType } from '@nestjs/graphql';
+import { IsArray, IsOptional, IsString } from 'class-validator';
+import { OperatorBoolean } from '../../../commons/enums/operator-boolean.enum';
+import { FilterKeyInput } from '../../../commons/filter-key.input';
+import { FilterStringInput } from '../../../commons/filter-string.input';
+import { FilterBooleanInput } from '../../../commons/filter-boolean.input';
+import { FilterDatetimeInput } from '../../../commons/filter-datetime.input';
 
 @InputType()
-export class FilterUserInput {
+export class FilterRoleInput {
   @Field(() => [FilterKeyInput], { nullable: true })
   @IsArray()
   @IsOptional()
   _key?: FilterKeyInput[];
-
-  @Field(() => [FilterStringInput], { nullable: true })
-  @IsArray()
-  @IsOptional()
-  email?: FilterStringInput[];
-
-  @Field(() => [FilterBooleanInput], { nullable: true })
-  @IsArray()
-  @IsOptional()
-  emailActive?: FilterBooleanInput[];
-
-  @Field(() => [FilterStringInput], { nullable: true })
-  @IsArray()
-  @IsOptional()
-  username?: FilterStringInput[];
 
   @Field(() => [FilterStringInput], { nullable: true })
   @IsArray()
@@ -36,7 +21,7 @@ export class FilterUserInput {
   @Field(() => [FilterStringInput], { nullable: true })
   @IsArray()
   @IsOptional()
-  surname?: FilterStringInput[];
+  description?: FilterStringInput[];
 
   @Field(() => [FilterBooleanInput], { nullable: true })
   @IsArray()

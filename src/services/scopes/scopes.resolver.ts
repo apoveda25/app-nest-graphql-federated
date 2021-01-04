@@ -6,11 +6,11 @@ import { CreateScopeInput } from './dto/create-scope.input';
 import { UpdateScopeInput } from './dto/update-scope.input';
 import { FilterScopeInput } from './dto/filter-scope.input';
 import { SortScopeInput } from './dto/sort-scope.input';
-import { PaginationInput } from '../commons/pagination.input';
+import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveScopeInput } from './dto/remove-scope.input';
 import { ScopesCreatePipe } from './pipes/scopes-create.pipe';
-import { Permissions } from '../authorization/permission.decorator';
-import { Permission } from '../authorization/permission';
+import { Permissions } from '../../authorization/permission.decorator';
+import { Permission } from '../../authorization/permission';
 import { ScopesUpdatePipe } from './pipes/scopes-update.pipe';
 
 @Resolver(() => Scope)

@@ -10,8 +10,8 @@ import { PaginationInput } from 'src/commons/pagination.input';
 import { RemoveRoleInput } from './dto/remove-role.input';
 import { RolesCreatePipe } from './pipes/roles-create.pipe';
 import { RolesUpdatePipe } from './pipes/roles-update.pipe';
-import { Permissions } from '../authorization/permission.decorator';
-import { Permission } from '../authorization/permission';
+import { Permissions } from '../../authorization/permission.decorator';
+import { Permission } from '../../authorization/permission';
 
 @Resolver(() => Role)
 export class RolesResolver {

@@ -1,13 +1,13 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { IsArray, IsOptional, IsString } from 'class-validator';
-import { OperatorBoolean } from '../../commons/enums/operator-boolean.enum';
-import { FilterKeyInput } from '../../commons/filter-key.input';
-import { FilterStringInput } from '../../commons/filter-string.input';
-import { FilterBooleanInput } from '../../commons/filter-boolean.input';
-import { FilterDatetimeInput } from '../../commons/filter-datetime.input';
+import { OperatorBoolean } from '../../../commons/enums/operator-boolean.enum';
+import { FilterKeyInput } from '../../../commons/filter-key.input';
+import { FilterStringInput } from '../../../commons/filter-string.input';
+import { FilterBooleanInput } from '../../../commons/filter-boolean.input';
+import { FilterDatetimeInput } from '../../../commons/filter-datetime.input';
 
 @InputType()
-export class FilterRoleInput {
+export class FilterScopeInput {
   @Field(() => [FilterKeyInput], { nullable: true })
   @IsArray()
   @IsOptional()

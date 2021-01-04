@@ -4,13 +4,13 @@ import { aql } from 'arangojs/aql';
 import type { DocumentCollection } from 'arangojs/collection';
 import { FilterUserInput } from './dto/filter-user.input';
 import { SortUserInput } from './dto/sort-user.input';
-import { PaginationInput } from '../commons/pagination.input';
+import { PaginationInput } from '../../commons/pagination.input';
 import { CreateUserHash } from './dto/create-user-hash';
 import { UpdateUserInput } from './dto/update-user.input';
 import { RemoveUserInput } from './dto/remove-user.input';
 import { User } from './entities/user.entity';
-import { Connection } from '../database/connection';
-import { QueryParser } from '../database/query-parser';
+import { Connection } from '../../database/connection';
+import { QueryParser } from '../../database/query-parser';
 
 @Injectable()
 export class UsersService {

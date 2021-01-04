@@ -1,8 +1,8 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
-import { IContext } from '../../commons/interfaces/context';
+import { IContext } from '../../../commons/interfaces/context';
 
 @Injectable()
-export class UsersUpdatePipe implements PipeTransform {
+export class ScopesUpdatePipe implements PipeTransform {
   private context: IContext;
 
   transform(value: any, metadata: ArgumentMetadata) {

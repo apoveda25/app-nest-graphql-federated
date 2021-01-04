@@ -1,8 +1,8 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
-import { IContext } from '../../commons/interfaces/context';
+import { IContext } from '../../../commons/interfaces/context';
 
 @Injectable()
-export class UsersCreatePipe implements PipeTransform {
+export class RolesUpdatePipe implements PipeTransform {
   private context: IContext;
 
   transform(value: any, metadata: ArgumentMetadata) {
@@ -11,6 +11,6 @@ export class UsersCreatePipe implements PipeTransform {
       return value;
     }
 
-    return value.map((el) => ({ ...el, createdBy: this.context._id }));
+    return value.map((el) => ({ ...el, updatedBy: this.context._id }));
   }
 }
