@@ -13,6 +13,8 @@ import { FederationConfigService } from './federation/federation-config.service'
 import { UsersModule } from './services/users/users.module';
 import { RolesModule } from './services/roles/roles.module';
 import { ScopesModule } from './services/scopes/scopes.module';
+import { AuthorizationByRoleModule } from './services/authorization-by-role/authorization-by-role.module';
+import { PermissionsGrantedModule } from './services/permissions-granted/permissions-granted.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { ScopesModule } from './services/scopes/scopes.module';
     FederationModule,
     RolesModule,
     ScopesModule,
+    AuthorizationByRoleModule,
+    PermissionsGrantedModule,
   ],
   providers: [
     {

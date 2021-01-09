@@ -25,13 +25,13 @@ export class UsersService {
     this.collection = this.db.collection<User[]>('Users');
   }
 
-  async create(createUsersInput: CreateUserHash[]): Promise<User[]> {
+  async create(documents: CreateUserHash[]): Promise<User[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.saveAll(createUsersInput, {
+      this.collection.saveAll(documents, {
         returnNew: true,
       }),
     );
@@ -61,7 +61,7 @@ export class UsersService {
     return await cursor.map((el) => el);
   }
 
-  async countAll(filters): Promise<number> {
+  async countAll(filters?: FilterUserInput): Promise<number> {
     const cursor = await this.db.query(aql`
       RETURN COUNT(
         FOR doc IN ${this.collection}
@@ -87,13 +87,13 @@ export class UsersService {
     return docs[0] || {};
   }
 
-  async update(updateUsersInput: UpdateUserInput[]): Promise<User[]> {
+  async update(documents: UpdateUserInput[]): Promise<User[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.updateAll(updateUsersInput, { returnNew: true }),
+      this.collection.updateAll(documents, { returnNew: true }),
     );
 
     await trx.commit();
@@ -101,14 +101,14 @@ export class UsersService {
     return docs.map((doc) => doc.new);
   }
 
-  async remove(removeUsersInput: RemoveUserInput[]): Promise<User[]> {
+  async remove(documents: RemoveUserInput[]): Promise<User[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
       this.db.query(aql`
-        FOR item IN ${removeUsersInput}
+        FOR item IN ${documents}
         LET doc = DOCUMENT(item._id)
         REMOVE doc IN ${this.collection}
         RETURN OLD

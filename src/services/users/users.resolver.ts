@@ -38,9 +38,9 @@ export class UsersResolver {
       new ParseArrayPipe({ items: CreateUserInput }),
       new ParseArrayPipe({ items: CreateUserHash }),
     )
-    create: CreateUserHash[],
+    createInput: CreateUserHash[],
   ) {
-    return this.usersService.create(create);
+    return this.usersService.create(createInput);
   }
 
   @Query(() => [User])
@@ -48,8 +48,10 @@ export class UsersResolver {
   findAllUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
     filters?: FilterUserInput,
+
     @Args('sort', { type: () => SortUserInput, nullable: true })
     sort?: SortUserInput,
+
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination?: PaginationInput,
   ) {

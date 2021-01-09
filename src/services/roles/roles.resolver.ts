@@ -38,8 +38,10 @@ export class RolesResolver {
   findAllRoles(
     @Args('filters', { type: () => FilterRoleInput, nullable: true })
     filters?: FilterRoleInput,
+
     @Args('sort', { type: () => SortRoleInput, nullable: true })
     sort?: SortRoleInput,
+
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination?: PaginationInput,
   ) {

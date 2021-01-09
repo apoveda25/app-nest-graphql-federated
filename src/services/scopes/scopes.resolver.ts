@@ -38,8 +38,10 @@ export class ScopesResolver {
   findAllScopes(
     @Args('filters', { type: () => FilterScopeInput, nullable: true })
     filters?: FilterScopeInput,
+
     @Args('sort', { type: () => SortScopeInput, nullable: true })
     sort?: SortScopeInput,
+
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination?: PaginationInput,
   ) {

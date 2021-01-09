@@ -24,13 +24,13 @@ export class RolesService {
     this.collection = this.db.collection<Role[]>('Roles');
   }
 
-  async create(createRolesInput: CreateRoleInput[]) {
+  async create(documents: CreateRoleInput[]) {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.saveAll(createRolesInput, {
+      this.collection.saveAll(documents, {
         returnNew: true,
       }),
     );
@@ -60,7 +60,7 @@ export class RolesService {
     return await cursor.map((el) => el);
   }
 
-  async countAll(filters): Promise<number> {
+  async countAll(filters?: FilterRoleInput): Promise<number> {
     const cursor = await this.db.query(aql`
       RETURN COUNT(
         FOR doc IN ${this.collection}
@@ -86,13 +86,13 @@ export class RolesService {
     return docs[0] || {};
   }
 
-  async update(updateRolesInput: UpdateRoleInput[]): Promise<Role[]> {
+  async update(documents: UpdateRoleInput[]): Promise<Role[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.collection.updateAll(updateRolesInput, { returnNew: true }),
+      this.collection.updateAll(documents, { returnNew: true }),
     );
 
     await trx.commit();
@@ -100,14 +100,14 @@ export class RolesService {
     return docs.map((doc) => doc.new);
   }
 
-  async remove(removeRolesInput: RemoveRoleInput[]): Promise<Role[]> {
+  async remove(documents: RemoveRoleInput[]): Promise<Role[]> {
     const trx = await this.db.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
       this.db.query(aql`
-        FOR item IN ${removeRolesInput}
+        FOR item IN ${documents}
         LET doc = DOCUMENT(item._id)
         REMOVE doc IN ${this.collection}
         RETURN OLD

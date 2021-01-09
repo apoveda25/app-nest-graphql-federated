@@ -6,6 +6,13 @@ export enum Permission {
   UsersFindAll = 'users_find_all',
   UsersCount = 'users_count',
 
+  AuthorizationByRoleCreate = 'authorization_by_role_create',
+  AuthorizationByRoleUpdate = 'authorization_by_role_update',
+  AuthorizationByRoleRemove = 'authorization_by_role_remove',
+  AuthorizationByRoleFindOne = 'authorization_by_role_find_one',
+  AuthorizationByRoleFindAll = 'authorization_by_role_find_all',
+  AuthorizationByRoleCount = 'authorization_by_role_count',
+
   RolesCreate = 'roles_create',
   RolesUpdate = 'roles_update',
   RolesRemove = 'roles_remove',
