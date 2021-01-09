@@ -20,6 +20,13 @@ export enum Permission {
   RolesFindAll = 'roles_find_all',
   RolesCount = 'roles_count',
 
+  PermissionsGrantedCreate = 'permissions_granted_create',
+  PermissionsGrantedUpdate = 'permissions_granted_update',
+  PermissionsGrantedRemove = 'permissions_granted_remove',
+  PermissionsGrantedFindOne = 'permissions_granted_find_one',
+  PermissionsGrantedFindAll = 'permissions_granted_find_all',
+  PermissionsGrantedCount = 'permissions_granted_count',
+
   ScopesCreate = 'scopes_create',
   ScopesUpdate = 'scopes_update',
   ScopesRemove = 'scopes_remove',

@@ -69,9 +69,9 @@ export class AuthorizationByRoleResolver {
     return this.authorizationByRoleService.countAll(filters);
   }
 
-  @Query(() => AuthorizationByRole, { name: 'authorizationByRole' })
+  @Query(() => AuthorizationByRole)
   @Permissions(Permission.AuthorizationByRoleFindOne)
-  findOne(@Args('_key', { type: () => ID }) _key: string) {
+  findOnePermissionsGranted(@Args('_key', { type: () => ID }) _key: string) {
     return this.authorizationByRoleService.findOne(_key);
   }
 
