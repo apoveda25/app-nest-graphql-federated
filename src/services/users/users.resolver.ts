@@ -7,6 +7,8 @@ import {
   Args,
   ID,
   Int,
+  ResolveField,
+  Parent,
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
@@ -21,10 +23,18 @@ import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
 import { UsersCreatePipe } from './pipes/users-create.pipe';
 import { UsersUpdatePipe } from './pipes/users-update.pipe';
+import { AuthorizationByRoleService } from '../authorization-by-role/authorization-by-role.service';
+import { FilterAuthorizationByRoleInput } from '../authorization-by-role/dto/filter-authorization-by-role.input';
+import { SortAuthorizationByRoleInput } from '../authorization-by-role/dto/sort-authorization-by-role.input';
+import { FilterRoleInput } from '../roles/dto/filter-role.input';
+import { SortRoleInput } from '../roles/dto/sort-role.input';
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authorizationByRoleService: AuthorizationByRoleService,
+  ) {}
 
   @Mutation(() => [User])
   @UsePipes(UsersCreatePipe)
@@ -96,6 +106,47 @@ export class UsersResolver {
     remove: RemoveUserInput[],
   ) {
     return this.usersService.remove(remove);
+  }
+
+  @ResolveField()
+  async authorizationByRole(
+    @Parent() user: User,
+
+    @Args('filtersEdge', {
+      type: () => FilterAuthorizationByRoleInput,
+      nullable: true,
+    })
+    filtersEdge?: FilterAuthorizationByRoleInput,
+
+    @Args('sortEdge', {
+      type: () => SortAuthorizationByRoleInput,
+      nullable: true,
+    })
+    sortEdge?: SortAuthorizationByRoleInput,
+
+    @Args('filtersVertex', {
+      type: () => FilterRoleInput,
+      nullable: true,
+    })
+    filtersVertex?: FilterRoleInput,
+
+    @Args('sortVertex', {
+      type: () => SortRoleInput,
+      nullable: true,
+    })
+    sortVertex?: SortRoleInput,
+
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.authorizationByRoleService.outboundOneLevel({
+      _id: user._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
   }
 
   @ResolveReference()

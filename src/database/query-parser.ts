@@ -3,17 +3,17 @@ import { aql, GeneratedAqlQuery } from 'arangojs/aql';
 
 @Injectable()
 export class QueryParser {
-  public filtersToAql(filters: any): GeneratedAqlQuery[] {
+  public filtersToAql(filters: any, node = 'doc'): GeneratedAqlQuery[] {
     return Object.keys(filters || {})
       .filter((key: string) => key !== 'separator')
       .map((key: string, i: number) => {
         return filters[key].map(
           (el: { value: any; operator: string }, j: number) => {
             return i === 0 && j === 0
-              ? aql`FILTER doc.${aql.literal(key)} ${aql.literal(
+              ? aql`FILTER ${node}.${aql.literal(key)} ${aql.literal(
                   el.operator,
                 )} ${el.value} `
-              : aql` ${aql.literal(filters.separator)} doc.${aql.literal(
+              : aql` ${aql.literal(filters.separator)} ${node}.${aql.literal(
                   key,
                 )} ${aql.literal(el.operator)} ${el.value} `;
           },
@@ -24,14 +24,14 @@ export class QueryParser {
       );
   }
 
-  public sortToAql(sort: any): GeneratedAqlQuery[] {
+  public sortToAql(sort: any, node = 'doc'): GeneratedAqlQuery[] {
     const sortQuery = Object.keys(sort || {})
       .filter((key: string) => sort[key])
       .filter((key: string) => key !== 'sort')
       .map((key: string, i: number) => {
         return i === 0
-          ? aql`SORT doc.${aql.literal(key)}`
-          : aql`, doc.${aql.literal(key)}`;
+          ? aql`SORT ${node}.${aql.literal(key)}`
+          : aql`, ${node}.${aql.literal(key)}`;
       });
 
     if (sort) sortQuery.push(aql` ${aql.literal(sort.sort)}`);

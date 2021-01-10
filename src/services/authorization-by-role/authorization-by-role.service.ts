@@ -11,6 +11,10 @@ import { FilterAuthorizationByRoleInput } from './dto/filter-authorization-by-ro
 import { SortAuthorizationByRoleInput } from './dto/sort-authorization-by-role.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveAuthorizationByRoleInput } from './dto/remove-authorization-by-role.input';
+import { FilterRoleInput } from '../roles/dto/filter-role.input';
+import { SortRoleInput } from '../roles/dto/sort-role.input';
+import { FilterUserInput } from '../users/dto/filter-user.input';
+import { SortUserInput } from '../users/dto/sort-user.input';
 
 @Injectable()
 export class AuthorizationByRoleService {
@@ -126,5 +130,61 @@ export class AuthorizationByRoleService {
     await trx.commit();
 
     return docs.map((doc) => doc);
+  }
+
+  async outboundOneLevel({
+    _id,
+    filtersEdge,
+    sortEdge,
+    filtersVertex,
+    sortVertex,
+    pagination = { offset: 0, count: 10 },
+  }: {
+    _id: string;
+    filtersEdge?: FilterAuthorizationByRoleInput;
+    sortEdge?: SortAuthorizationByRoleInput;
+    filtersVertex?: FilterRoleInput;
+    sortVertex?: SortRoleInput;
+    pagination?: PaginationInput;
+  }): Promise<AuthorizationByRole[]> {
+    const cursor = await this.db.query(aql`
+      FOR vertex, edge IN OUTBOUND ${_id} ${this.collection}
+      ${aql.join(this.queryParser.filtersToAql(filtersEdge, 'edge'))}
+      ${aql.join(this.queryParser.sortToAql(sortEdge, 'edge'))}
+      ${aql.join(this.queryParser.filtersToAql(filtersVertex, 'vertex'))}
+      ${aql.join(this.queryParser.sortToAql(sortVertex, 'vertex'))}
+      ${this.queryParser.paginationToAql(pagination)}
+      RETURN MERGE(edge, { _to: vertex })
+    `);
+
+    return await cursor.map((el) => el);
+  }
+
+  async inboundOneLevel({
+    _id,
+    filtersEdge,
+    sortEdge,
+    filtersVertex,
+    sortVertex,
+    pagination = { offset: 0, count: 10 },
+  }: {
+    _id: string;
+    filtersEdge?: FilterAuthorizationByRoleInput;
+    sortEdge?: SortAuthorizationByRoleInput;
+    filtersVertex?: FilterUserInput;
+    sortVertex?: SortUserInput;
+    pagination?: PaginationInput;
+  }): Promise<AuthorizationByRole[]> {
+    const cursor = await this.db.query(aql`
+      FOR vertex, edge IN INBOUND ${_id} ${this.collection}
+      ${aql.join(this.queryParser.filtersToAql(filtersEdge, 'edge'))}
+      ${aql.join(this.queryParser.sortToAql(sortEdge, 'edge'))}
+      ${aql.join(this.queryParser.filtersToAql(filtersVertex, 'vertex'))}
+      ${aql.join(this.queryParser.sortToAql(sortVertex, 'vertex'))}
+      ${this.queryParser.paginationToAql(pagination)}
+      RETURN MERGE(edge, { _from: vertex })
+    `);
+
+    return await cursor.map((el) => el);
   }
 }

@@ -4,8 +4,9 @@ import {
   Field,
   ID,
   HideField,
-  Int,
+  Args,
 } from '@nestjs/graphql';
+import { AuthorizationByRole } from '../../authorization-by-role/entities/authorization-by-role.entity';
 
 @ObjectType()
 @Directive('@key(fields: "_id")')
@@ -51,4 +52,7 @@ export class User {
 
   @Field(() => String)
   updatedAt: string;
+
+  @Field(() => [AuthorizationByRole])
+  authorizationByRole: AuthorizationByRole[];
 }

@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { PermissionsGrantedService } from './permissions-granted.service';
 import { PermissionsGranted } from './entities/permissions-granted.entity';
 import { CreatePermissionsGrantedInput } from './dto/create-permissions-granted.input';
@@ -12,11 +21,16 @@ import { FilterPermissionsGrantedInput } from './dto/filter-permissions-granted.
 import { SortPermissionsGrantedInput } from './dto/sort-permissions-granted.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemovePermissionsGrantedInput } from './dto/remove-permissions-granted.input';
+import { IPermissionsGranted } from './entities/permissions-granted.interface';
+import { RolesService } from '../roles/roles.service';
+import { ScopesService } from '../scopes/scopes.service';
 
 @Resolver(() => PermissionsGranted)
 export class PermissionsGrantedResolver {
   constructor(
     private readonly permissionsGrantedService: PermissionsGrantedService,
+    private readonly rolesService: RolesService,
+    private readonly scopesService: ScopesService,
   ) {}
 
   @Mutation(() => [PermissionsGranted])
@@ -97,5 +111,15 @@ export class PermissionsGrantedResolver {
     remove: RemovePermissionsGrantedInput[],
   ) {
     return this.permissionsGrantedService.remove(remove);
+  }
+
+  @ResolveField()
+  async _from(@Parent() permissionsGranted: IPermissionsGranted) {
+    return this.rolesService.findOne(permissionsGranted._from);
+  }
+
+  @ResolveField()
+  async _to(@Parent() permissionsGranted: IPermissionsGranted) {
+    return this.scopesService.findOne(permissionsGranted._to);
   }
 }

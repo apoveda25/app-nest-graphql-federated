@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { RolesService } from './roles.service';
 import { Role } from './entities/role.entity';
 import { CreateRoleInput } from './dto/create-role.input';
@@ -12,10 +21,24 @@ import { RolesCreatePipe } from './pipes/roles-create.pipe';
 import { RolesUpdatePipe } from './pipes/roles-update.pipe';
 import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
+import { FilterAuthorizationByRoleInput } from '../authorization-by-role/dto/filter-authorization-by-role.input';
+import { SortAuthorizationByRoleInput } from '../authorization-by-role/dto/sort-authorization-by-role.input';
+import { FilterUserInput } from '../users/dto/filter-user.input';
+import { SortUserInput } from '../users/dto/sort-user.input';
+import { AuthorizationByRoleService } from '../authorization-by-role/authorization-by-role.service';
+import { PermissionsGrantedService } from '../permissions-granted/permissions-granted.service';
+import { FilterPermissionsGrantedInput } from '../permissions-granted/dto/filter-permissions-granted.input';
+import { SortPermissionsGrantedInput } from '../permissions-granted/dto/sort-permissions-granted.input';
+import { FilterScopeInput } from '../scopes/dto/filter-scope.input';
+import { SortScopeInput } from '../scopes/dto/sort-scope.input';
 
 @Resolver(() => Role)
 export class RolesResolver {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(
+    private readonly rolesService: RolesService,
+    private readonly authorizationByRoleService: AuthorizationByRoleService,
+    private readonly permissionsGrantedService: PermissionsGrantedService,
+  ) {}
 
   @Mutation(() => [Role])
   @UsePipes(RolesCreatePipe)
@@ -86,5 +109,87 @@ export class RolesResolver {
     remove: RemoveRoleInput[],
   ) {
     return this.rolesService.remove(remove);
+  }
+
+  @ResolveField()
+  async authorizationByRole(
+    @Parent() role: Role,
+
+    @Args('filtersEdge', {
+      type: () => FilterAuthorizationByRoleInput,
+      nullable: true,
+    })
+    filtersEdge?: FilterAuthorizationByRoleInput,
+
+    @Args('sortEdge', {
+      type: () => SortAuthorizationByRoleInput,
+      nullable: true,
+    })
+    sortEdge?: SortAuthorizationByRoleInput,
+
+    @Args('filtersVertex', {
+      type: () => FilterUserInput,
+      nullable: true,
+    })
+    filtersVertex?: FilterUserInput,
+
+    @Args('sortVertex', {
+      type: () => SortUserInput,
+      nullable: true,
+    })
+    sortVertex?: SortUserInput,
+
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.authorizationByRoleService.inboundOneLevel({
+      _id: role._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
+  }
+
+  @ResolveField()
+  async permissionsGranted(
+    @Parent() role: Role,
+
+    @Args('filtersEdge', {
+      type: () => FilterPermissionsGrantedInput,
+      nullable: true,
+    })
+    filtersEdge?: FilterPermissionsGrantedInput,
+
+    @Args('sortEdge', {
+      type: () => SortPermissionsGrantedInput,
+      nullable: true,
+    })
+    sortEdge?: SortPermissionsGrantedInput,
+
+    @Args('filtersVertex', {
+      type: () => FilterScopeInput,
+      nullable: true,
+    })
+    filtersVertex?: FilterScopeInput,
+
+    @Args('sortVertex', {
+      type: () => SortScopeInput,
+      nullable: true,
+    })
+    sortVertex?: SortScopeInput,
+
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.permissionsGrantedService.outboundOneLevel({
+      _id: role._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
   }
 }

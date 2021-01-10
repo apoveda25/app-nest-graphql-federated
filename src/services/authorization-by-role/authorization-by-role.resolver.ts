@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { AuthorizationByRoleService } from './authorization-by-role.service';
 import { AuthorizationByRole } from './entities/authorization-by-role.entity';
 import { CreateAuthorizationByRoleInput } from './dto/create-authorization-by-role.input';
@@ -12,11 +21,16 @@ import { AuthorizationByRoleCreatePipe } from './pipes/authorization-by-role-cre
 import { AuthorizationByRoleUpdatePipe } from './pipes/authorization-by-role-update.pipe';
 import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
+import { UsersService } from '../users/users.service';
+import { RolesService } from '../roles/roles.service';
+import { IAuthorizationByRole } from './entities/authorization-by-role.interface';
 
 @Resolver(() => AuthorizationByRole)
 export class AuthorizationByRoleResolver {
   constructor(
     private readonly authorizationByRoleService: AuthorizationByRoleService,
+    private readonly usersService: UsersService,
+    private readonly rolesService: RolesService,
   ) {}
 
   @Mutation(() => [AuthorizationByRole])
@@ -98,5 +112,15 @@ export class AuthorizationByRoleResolver {
     remove: RemoveAuthorizationByRoleInput[],
   ) {
     return this.authorizationByRoleService.remove(remove);
+  }
+
+  @ResolveField()
+  async _from(@Parent() authorizationByRole: IAuthorizationByRole) {
+    return this.usersService.findOne(authorizationByRole._from);
+  }
+
+  @ResolveField()
+  async _to(@Parent() authorizationByRole: IAuthorizationByRole) {
+    return this.rolesService.findOne(authorizationByRole._to);
   }
 }

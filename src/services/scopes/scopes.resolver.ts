@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { ParseArrayPipe, UsePipes } from '@nestjs/common';
 import { ScopesService } from './scopes.service';
 import { Scope } from './entities/scope.entity';
@@ -12,10 +21,18 @@ import { ScopesCreatePipe } from './pipes/scopes-create.pipe';
 import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
 import { ScopesUpdatePipe } from './pipes/scopes-update.pipe';
+import { FilterPermissionsGrantedInput } from '../permissions-granted/dto/filter-permissions-granted.input';
+import { SortPermissionsGrantedInput } from '../permissions-granted/dto/sort-permissions-granted.input';
+import { FilterRoleInput } from '../roles/dto/filter-role.input';
+import { SortRoleInput } from '../roles/dto/sort-role.input';
+import { PermissionsGrantedService } from '../permissions-granted/permissions-granted.service';
 
 @Resolver(() => Scope)
 export class ScopesResolver {
-  constructor(private readonly scopesService: ScopesService) {}
+  constructor(
+    private readonly scopesService: ScopesService,
+    private readonly permissionsGrantedService: PermissionsGrantedService,
+  ) {}
 
   @Mutation(() => [Scope])
   @UsePipes(ScopesCreatePipe)
@@ -86,5 +103,46 @@ export class ScopesResolver {
     remove: RemoveScopeInput[],
   ) {
     return this.scopesService.remove(remove);
+  }
+
+  @ResolveField()
+  async permissionsGranted(
+    @Parent() scope: Scope,
+
+    @Args('filtersEdge', {
+      type: () => FilterPermissionsGrantedInput,
+      nullable: true,
+    })
+    filtersEdge?: FilterPermissionsGrantedInput,
+
+    @Args('sortEdge', {
+      type: () => SortPermissionsGrantedInput,
+      nullable: true,
+    })
+    sortEdge?: SortPermissionsGrantedInput,
+
+    @Args('filtersVertex', {
+      type: () => FilterRoleInput,
+      nullable: true,
+    })
+    filtersVertex?: FilterRoleInput,
+
+    @Args('sortVertex', {
+      type: () => SortRoleInput,
+      nullable: true,
+    })
+    sortVertex?: SortRoleInput,
+
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.permissionsGrantedService.inboundOneLevel({
+      _id: scope._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
   }
 }
