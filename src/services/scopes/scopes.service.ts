@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { aql, Database } from 'arangojs';
-import { DocumentCollection } from 'arangojs/collection';
-import { Connection } from '../../database/connection';
-import { QueryParser } from '../../database/query-parser';
+import { aql } from 'arangojs';
 import { CreateScopeInput } from './dto/create-scope.input';
 import { UpdateScopeInput } from './dto/update-scope.input';
 import { Scope } from './entities/scope.entity';
@@ -10,34 +7,14 @@ import { FilterScopeInput } from './dto/filter-scope.input';
 import { SortScopeInput } from './dto/sort-scope.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveScopeInput } from './dto/remove-scope.input';
+import { ScopesRepository } from './scopes.repository';
 
 @Injectable()
 export class ScopesService {
-  private db: Database;
-  private collection: DocumentCollection;
-
-  constructor(
-    private connection: Connection,
-    private queryParser: QueryParser,
-  ) {
-    this.db = this.connection.db;
-    this.collection = this.db.collection<Scope[]>('Scopes');
-  }
+  constructor(private readonly scopesRepository: ScopesRepository) {}
 
   async create(documents: CreateScopeInput[]) {
-    const trx = await this.db.beginTransaction({
-      write: [this.collection],
-    });
-
-    const docs = await trx.step(() =>
-      this.collection.saveAll(documents, {
-        returnNew: true,
-      }),
-    );
-
-    await trx.commit();
-
-    return docs.map((doc) => doc.new);
+    return this.scopesRepository.create(documents);
   }
 
   async findAll({
@@ -49,73 +26,22 @@ export class ScopesService {
     sort?: SortScopeInput;
     pagination?: PaginationInput;
   }): Promise<Scope[]> {
-    const cursor = await this.db.query(aql`
-      FOR doc IN ${this.collection}
-      ${aql.join(this.queryParser.filtersToAql(filters))}
-      ${aql.join(this.queryParser.sortToAql(sort))}
-      ${this.queryParser.paginationToAql(pagination)}
-      RETURN doc
-    `);
-
-    return await cursor.map((el) => el);
+    return this.scopesRepository.findAll({ filters, sort, pagination });
   }
 
   async countAll(filters?: FilterScopeInput): Promise<number> {
-    const cursor = await this.db.query(aql`
-      RETURN COUNT(
-        FOR doc IN ${this.collection}
-        ${aql.join(this.queryParser.filtersToAql(filters))}
-        RETURN doc
-      )
-    `);
-
-    const data = await cursor.map((el) => el);
-
-    return data[0];
+    return this.scopesRepository.countAll(filters);
   }
 
   async findOne(_key: string): Promise<Scope | unknown> {
-    const cursor = await this.db.query(aql`
-      FOR doc IN ${this.collection}
-      FILTER doc._key == ${_key} || doc._id == ${_key}
-      RETURN doc
-    `);
-
-    const docs = await cursor.map((val) => val);
-
-    return docs[0] || {};
+    return this.scopesRepository.findOne(_key);
   }
 
   async update(documents: UpdateScopeInput[]): Promise<Scope[]> {
-    const trx = await this.db.beginTransaction({
-      write: [this.collection],
-    });
-
-    const docs = await trx.step(() =>
-      this.collection.updateAll(documents, { returnNew: true }),
-    );
-
-    await trx.commit();
-
-    return docs.map((doc) => doc.new);
+    return this.scopesRepository.update(documents);
   }
 
   async remove(documents: RemoveScopeInput[]): Promise<Scope[]> {
-    const trx = await this.db.beginTransaction({
-      write: [this.collection],
-    });
-
-    const docs = await trx.step(() =>
-      this.db.query(aql`
-        FOR item IN ${documents}
-        LET doc = DOCUMENT(item._id)
-        REMOVE doc IN ${this.collection}
-        RETURN OLD
-      `),
-    );
-
-    await trx.commit();
-
-    return docs.map((doc) => doc);
+    return this.scopesRepository.remove(documents);
   }
 }

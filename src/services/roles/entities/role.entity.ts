@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { AuthorizationByRole } from 'src/services/authorization-by-role/entities/authorization-by-role.entity';
+import { AuthorizationByRole } from '../../authorization-by-role/entities/authorization-by-role.entity';
 import { PermissionsGranted } from '../../permissions-granted/entities/permissions-granted.entity';
 
 @ObjectType()

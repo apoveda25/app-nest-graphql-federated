@@ -2,10 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { GraphQLFederationModule } from '@nestjs/graphql';
-import { CommonsModule } from './commons/commons.module';
 import configuration from './config/configuration';
 import { validate } from './config/validation';
-import { DatabaseModule } from './database/database.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { PermissionsGuard } from './authorization/permissions.guard';
 import { FederationModule } from './federation/federation.module';
@@ -29,8 +27,6 @@ import { PermissionsGrantedModule } from './services/permissions-granted/permiss
       useClass: FederationConfigService,
     }),
     UsersModule,
-    CommonsModule,
-    DatabaseModule,
     AuthorizationModule,
     FederationModule,
     RolesModule,

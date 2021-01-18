@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { aql, Database } from 'arangojs';
+import { aql } from 'arangojs';
 import { DocumentCollection } from 'arangojs/collection';
 import { PaginationInput } from 'src/commons/pagination.input';
 import { Connection } from '../../database/connection';
@@ -13,19 +13,17 @@ import { Role } from './entities/role.entity';
 
 @Injectable()
 export class RolesService {
-  private db: Database;
   private collection: DocumentCollection;
 
   constructor(
     private connection: Connection,
     private queryParser: QueryParser,
   ) {
-    this.db = this.connection.db;
-    this.collection = this.db.collection<Role[]>('Roles');
+    this.collection = this.connection.collection<Role[]>('Roles');
   }
 
   async create(documents: CreateRoleInput[]) {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
@@ -49,7 +47,7 @@ export class RolesService {
     sort?: SortRoleInput;
     pagination?: PaginationInput;
   }): Promise<Role[]> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR doc IN ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filters))}
       ${aql.join(this.queryParser.sortToAql(sort))}
@@ -61,7 +59,7 @@ export class RolesService {
   }
 
   async countAll(filters?: FilterRoleInput): Promise<number> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       RETURN COUNT(
         FOR doc IN ${this.collection}
         ${aql.join(this.queryParser.filtersToAql(filters))}
@@ -75,7 +73,7 @@ export class RolesService {
   }
 
   async findOne(_key: string): Promise<Role | unknown> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR doc IN ${this.collection}
       FILTER doc._key == ${_key} || doc._id == ${_key}
       RETURN doc
@@ -87,7 +85,7 @@ export class RolesService {
   }
 
   async update(documents: UpdateRoleInput[]): Promise<Role[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
@@ -101,12 +99,12 @@ export class RolesService {
   }
 
   async remove(documents: RemoveRoleInput[]): Promise<Role[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.db.query(aql`
+      this.connection.query(aql`
         FOR item IN ${documents}
         LET doc = DOCUMENT(item._id)
         REMOVE doc IN ${this.collection}

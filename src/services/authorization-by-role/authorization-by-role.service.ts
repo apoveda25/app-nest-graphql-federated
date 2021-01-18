@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAuthorizationByRoleInput } from './dto/create-authorization-by-role.input';
 import { UpdateAuthorizationByRoleInput } from './dto/update-authorization-by-role.input';
-import { Database } from 'arangojs/database';
 import { DocumentCollection } from 'arangojs/collection';
 import { Connection } from '../../database/connection';
 import { QueryParser } from '../../database/query-parser';
@@ -18,15 +17,13 @@ import { SortUserInput } from '../users/dto/sort-user.input';
 
 @Injectable()
 export class AuthorizationByRoleService {
-  private db: Database;
   private collection: DocumentCollection;
 
   constructor(
     private connection: Connection,
     private queryParser: QueryParser,
   ) {
-    this.db = this.connection.db;
-    this.collection = this.db.collection<AuthorizationByRole[]>(
+    this.collection = this.connection.collection<AuthorizationByRole[]>(
       'AuthorizationByRole',
     );
   }
@@ -34,7 +31,7 @@ export class AuthorizationByRoleService {
   async create(
     documents: CreateAuthorizationByRoleInput[],
   ): Promise<AuthorizationByRole[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
@@ -58,7 +55,7 @@ export class AuthorizationByRoleService {
     sort?: SortAuthorizationByRoleInput;
     pagination?: PaginationInput;
   }): Promise<AuthorizationByRole[]> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR doc IN ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filters))}
       ${aql.join(this.queryParser.sortToAql(sort))}
@@ -70,7 +67,7 @@ export class AuthorizationByRoleService {
   }
 
   async countAll(filters?: FilterAuthorizationByRoleInput): Promise<number> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       RETURN COUNT(
         FOR doc IN ${this.collection}
         ${aql.join(this.queryParser.filtersToAql(filters))}
@@ -84,7 +81,7 @@ export class AuthorizationByRoleService {
   }
 
   async findOne(_key: string): Promise<AuthorizationByRole | unknown> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR doc IN ${this.collection}
       FILTER doc._key == ${_key} || doc._id == ${_key}
       RETURN doc
@@ -98,7 +95,7 @@ export class AuthorizationByRoleService {
   async update(
     documents: UpdateAuthorizationByRoleInput[],
   ): Promise<AuthorizationByRole[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
@@ -114,12 +111,12 @@ export class AuthorizationByRoleService {
   async remove(
     documents: RemoveAuthorizationByRoleInput[],
   ): Promise<AuthorizationByRole[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.db.query(aql`
+      this.connection.query(aql`
         FOR item IN ${documents}
         LET doc = DOCUMENT(item._id)
         REMOVE doc IN ${this.collection}
@@ -147,7 +144,7 @@ export class AuthorizationByRoleService {
     sortVertex?: SortRoleInput;
     pagination?: PaginationInput;
   }): Promise<AuthorizationByRole[]> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR vertex, edge IN OUTBOUND ${_id} ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.queryParser.sortToAql(sortEdge, 'edge'))}
@@ -175,7 +172,7 @@ export class AuthorizationByRoleService {
     sortVertex?: SortUserInput;
     pagination?: PaginationInput;
   }): Promise<AuthorizationByRole[]> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR vertex, edge IN INBOUND ${_id} ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.queryParser.sortToAql(sortEdge, 'edge'))}

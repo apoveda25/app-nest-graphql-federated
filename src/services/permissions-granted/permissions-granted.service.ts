@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Database, aql } from 'arangojs';
+import { aql } from 'arangojs';
 import { DocumentCollection } from 'arangojs/collection';
 import { CreatePermissionsGrantedInput } from './dto/create-permissions-granted.input';
 import { UpdatePermissionsGrantedInput } from './dto/update-permissions-granted.input';
@@ -17,15 +17,13 @@ import { SortRoleInput } from '../roles/dto/sort-role.input';
 
 @Injectable()
 export class PermissionsGrantedService {
-  private db: Database;
   private collection: DocumentCollection;
 
   constructor(
     private connection: Connection,
     private queryParser: QueryParser,
   ) {
-    this.db = this.connection.db;
-    this.collection = this.db.collection<PermissionsGranted[]>(
+    this.collection = this.connection.collection<PermissionsGranted[]>(
       'PermissionsGranted',
     );
   }
@@ -33,7 +31,7 @@ export class PermissionsGrantedService {
   async create(
     documents: CreatePermissionsGrantedInput[],
   ): Promise<PermissionsGranted[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
@@ -57,7 +55,7 @@ export class PermissionsGrantedService {
     sort?: SortPermissionsGrantedInput;
     pagination?: PaginationInput;
   }): Promise<PermissionsGranted[]> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR doc IN ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filters))}
       ${aql.join(this.queryParser.sortToAql(sort))}
@@ -69,7 +67,7 @@ export class PermissionsGrantedService {
   }
 
   async countAll(filters?: FilterPermissionsGrantedInput): Promise<number> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       RETURN COUNT(
         FOR doc IN ${this.collection}
         ${aql.join(this.queryParser.filtersToAql(filters))}
@@ -83,7 +81,7 @@ export class PermissionsGrantedService {
   }
 
   async findOne(_key: string): Promise<PermissionsGranted | unknown> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR doc IN ${this.collection}
       FILTER doc._key == ${_key} || doc._id == ${_key}
       RETURN doc
@@ -97,7 +95,7 @@ export class PermissionsGrantedService {
   async update(
     documents: UpdatePermissionsGrantedInput[],
   ): Promise<PermissionsGranted[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
@@ -113,12 +111,12 @@ export class PermissionsGrantedService {
   async remove(
     documents: RemovePermissionsGrantedInput[],
   ): Promise<PermissionsGranted[]> {
-    const trx = await this.db.beginTransaction({
+    const trx = await this.connection.beginTransaction({
       write: [this.collection],
     });
 
     const docs = await trx.step(() =>
-      this.db.query(aql`
+      this.connection.query(aql`
         FOR item IN ${documents}
         LET doc = DOCUMENT(item._id)
         REMOVE doc IN ${this.collection}
@@ -146,7 +144,7 @@ export class PermissionsGrantedService {
     sortVertex?: SortScopeInput;
     pagination?: PaginationInput;
   }): Promise<PermissionsGranted[]> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR vertex, edge IN OUTBOUND ${_id} ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.queryParser.sortToAql(sortEdge, 'edge'))}
@@ -174,7 +172,7 @@ export class PermissionsGrantedService {
     sortVertex?: SortRoleInput;
     pagination?: PaginationInput;
   }): Promise<PermissionsGranted[]> {
-    const cursor = await this.db.query(aql`
+    const cursor = await this.connection.query(aql`
       FOR vertex, edge IN INBOUND ${_id} ${this.collection}
       ${aql.join(this.queryParser.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.queryParser.sortToAql(sortEdge, 'edge'))}

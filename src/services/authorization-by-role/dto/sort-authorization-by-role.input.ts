@@ -1,6 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsString, IsOptional, IsBoolean } from 'class-validator';
-import { OperatorSort } from 'src/commons/enums/operator-sort.enum';
+import { OperatorSort } from '../../../commons/enums/operator-sort.enum';
 
 @InputType()
 export class SortAuthorizationByRoleInput {

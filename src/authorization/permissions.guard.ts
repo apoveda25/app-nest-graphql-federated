@@ -6,7 +6,7 @@ import { PERMISSIONS_KEY } from './permission.decorator';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const GqlCtx = GqlExecutionContext.create(context);

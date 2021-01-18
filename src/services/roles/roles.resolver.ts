@@ -15,7 +15,7 @@ import { UpdateRoleInput } from './dto/update-role.input';
 import { ParseArrayPipe, UsePipes } from '@nestjs/common';
 import { FilterRoleInput } from './dto/filter-role.input';
 import { SortRoleInput } from './dto/sort-role.input';
-import { PaginationInput } from 'src/commons/pagination.input';
+import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveRoleInput } from './dto/remove-role.input';
 import { RolesCreatePipe } from './pipes/roles-create.pipe';
 import { RolesUpdatePipe } from './pipes/roles-update.pipe';

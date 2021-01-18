@@ -1,10 +1,10 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsString, IsOptional, IsArray } from 'class-validator';
-import { FilterBooleanInput } from 'src/commons/filter-boolean.input';
+import { FilterBooleanInput } from '../../../commons/filter-boolean.input';
 import { FilterKeyInput } from '../../../commons/filter-key.input';
 import { FilterStringInput } from '../../../commons/filter-string.input';
 import { FilterDatetimeInput } from '../../../commons/filter-datetime.input';
-import { OperatorBoolean } from 'src/commons/enums/operator-boolean.enum';
+import { OperatorBoolean } from '../../../commons/enums/operator-boolean.enum';
 
 @InputType()
 export class FilterAuthorizationByRoleInput {
