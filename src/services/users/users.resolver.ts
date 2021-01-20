@@ -19,7 +19,6 @@ import { RemoveUserInput } from './dto/remove-user.input';
 import { FilterUserInput } from './dto/filter-user.input';
 import { SortUserInput } from './dto/sort-user.input';
 import { PaginationInput } from '../../commons/pagination.input';
-import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
 import { UsersCreatePipe } from './pipes/users-create.pipe';
 import { UsersUpdatePipe } from './pipes/users-update.pipe';
@@ -28,6 +27,7 @@ import {
   ISortToAQL,
 } from '../../database/arangodb/object-to-aql.interface';
 import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
+import { Authorization } from '../../authorization/authorization.decorator';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -35,7 +35,7 @@ export class UsersResolver {
 
   @Mutation(() => [User])
   @UsePipes(UsersCreatePipe)
-  @Permissions(Permission.UsersCreate)
+  @Authorization(Permission.UsersCreate)
   createUsers(
     @Args(
       {
@@ -52,8 +52,8 @@ export class UsersResolver {
 
   @Query(() => [User])
   @UsePipes(InputsQueryPipe)
-  @Permissions(Permission.UsersFindAll)
-  findAllUsers(
+  @Authorization(Permission.UsersSearch)
+  searchUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
     filters?: IFilterToAQL[],
 
@@ -68,8 +68,8 @@ export class UsersResolver {
 
   @Query(() => Int)
   @UsePipes(InputsQueryPipe)
-  @Permissions(Permission.UsersCount)
-  countAllUsers(
+  @Authorization(Permission.UsersCount)
+  countUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
     filters?: IFilterToAQL[],
   ) {
@@ -77,14 +77,14 @@ export class UsersResolver {
   }
 
   @Query(() => User)
-  @Permissions(Permission.UsersFindOne)
-  findOneUser(@Args('_key', { type: () => ID }) _key: string) {
+  @Authorization(Permission.UsersFind)
+  findUser(@Args('_key', { type: () => ID }) _key: string) {
     return this.usersService.findOne(_key);
   }
 
   @Mutation(() => [User])
   @UsePipes(UsersUpdatePipe)
-  @Permissions(Permission.UsersUpdate)
+  @Authorization(Permission.UsersUpdate)
   updateUsers(
     @Args(
       { name: 'update', type: () => [UpdateUserInput] },
@@ -96,7 +96,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => [User])
-  @Permissions(Permission.UsersRemove)
+  @Authorization(Permission.UsersRemove)
   removeUsers(
     @Args(
       { name: 'remove', type: () => [RemoveUserInput] },

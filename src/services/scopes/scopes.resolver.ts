@@ -18,7 +18,6 @@ import { SortScopeInput } from './dto/sort-scope.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveScopeInput } from './dto/remove-scope.input';
 import { ScopesCreatePipe } from './pipes/scopes-create.pipe';
-import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
 import { ScopesUpdatePipe } from './pipes/scopes-update.pipe';
 import {
@@ -26,13 +25,14 @@ import {
   ISortToAQL,
 } from '../../database/arangodb/object-to-aql.interface';
 import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
+import { Authorization } from '../../authorization/authorization.decorator';
 @Resolver(() => Scope)
 export class ScopesResolver {
   constructor(private readonly scopesService: ScopesService) {}
 
   @Mutation(() => [Scope])
   @UsePipes(ScopesCreatePipe)
-  @Permissions(Permission.ScopesCreate)
+  @Authorization(Permission.ScopesCreate)
   createScopes(
     @Args(
       {
@@ -48,8 +48,8 @@ export class ScopesResolver {
 
   @Query(() => [Scope])
   @UsePipes(InputsQueryPipe)
-  @Permissions(Permission.ScopesFindAll)
-  findAllScopes(
+  @Authorization(Permission.ScopesSearch)
+  searchScopes(
     @Args('filters', { type: () => FilterScopeInput, nullable: true })
     filters?: IFilterToAQL[],
 
@@ -64,8 +64,8 @@ export class ScopesResolver {
 
   @Query(() => Int)
   @UsePipes(InputsQueryPipe)
-  @Permissions(Permission.ScopesCount)
-  countAllScopes(
+  @Authorization(Permission.ScopesCount)
+  countScopes(
     @Args('filters', { type: () => FilterScopeInput, nullable: true })
     filters?: IFilterToAQL[],
   ) {
@@ -73,14 +73,14 @@ export class ScopesResolver {
   }
 
   @Query(() => Scope)
-  @Permissions(Permission.ScopesFindOne)
-  findOneScope(@Args('_key', { type: () => ID }) _key: string) {
+  @Authorization(Permission.ScopesFind)
+  findScope(@Args('_key', { type: () => ID }) _key: string) {
     return this.scopesService.findOne(_key);
   }
 
   @Mutation(() => [Scope])
   @UsePipes(ScopesUpdatePipe)
-  @Permissions(Permission.ScopesUpdate)
+  @Authorization(Permission.ScopesUpdate)
   updateScopes(
     @Args(
       { name: 'update', type: () => [UpdateScopeInput] },
@@ -92,7 +92,7 @@ export class ScopesResolver {
   }
 
   @Mutation(() => [Scope])
-  @Permissions(Permission.ScopesRemove)
+  @Authorization(Permission.ScopesRemove)
   removeScopes(
     @Args(
       { name: 'remove', type: () => [RemoveScopeInput] },

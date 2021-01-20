@@ -5,13 +5,11 @@ import { GraphQLFederationModule } from '@nestjs/graphql';
 import load from './config/load.config';
 import { validate } from './config/validate.config';
 import { AuthorizationModule } from './authorization/authorization.module';
-import { PermissionsGuard } from './authorization/permissions.guard';
 import { UsersModule } from './services/users/users.module';
 import { RolesModule } from './services/roles/roles.module';
 import { ScopesModule } from './services/scopes/scopes.module';
-// import { AuthorizationByRoleModule } from './services/authorization-by-role/authorization-by-role.module';
-// import { PermissionsGrantedModule } from './services/permissions-granted/permissions-granted.module';
 import { graphqlConfig } from './config/modules/graphql.config';
+import { AuthorizationGuard } from './authorization/authorization.guard';
 
 @Module({
   imports: [
@@ -27,17 +25,15 @@ import { graphqlConfig } from './config/modules/graphql.config';
       inject: [ConfigService],
       useFactory: graphqlConfig,
     }),
-    UsersModule,
     AuthorizationModule,
+    UsersModule,
     RolesModule,
     ScopesModule,
-    // AuthorizationByRoleModule,
-    // PermissionsGrantedModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: PermissionsGuard,
+      useClass: AuthorizationGuard,
     },
   ],
 })

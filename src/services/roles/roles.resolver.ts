@@ -19,19 +19,13 @@ import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveRoleInput } from './dto/remove-role.input';
 import { RolesCreatePipe } from './pipes/roles-create.pipe';
 import { RolesUpdatePipe } from './pipes/roles-update.pipe';
-import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
-// import { FilterAuthorizationByRoleInput } from '../authorization-by-role/dto/filter-authorization-by-role.input';
-// import { SortAuthorizationByRoleInput } from '../authorization-by-role/dto/sort-authorization-by-role.input';
-// import { AuthorizationByRoleService } from '../authorization-by-role/authorization-by-role.service';
-// import { PermissionsGrantedService } from '../permissions-granted/permissions-granted.service';
-// import { FilterPermissionsGrantedInput } from '../permissions-granted/dto/filter-permissions-granted.input';
-// import { SortPermissionsGrantedInput } from '../permissions-granted/dto/sort-permissions-granted.input';
 import {
   IFilterToAQL,
   ISortToAQL,
 } from '../../database/arangodb/object-to-aql.interface';
 import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
+import { Authorization } from '../../authorization/authorization.decorator';
 
 @Resolver(() => Role)
 export class RolesResolver {
@@ -39,7 +33,7 @@ export class RolesResolver {
 
   @Mutation(() => [Role])
   @UsePipes(RolesCreatePipe)
-  @Permissions(Permission.RolesCreate)
+  @Authorization(Permission.RolesCreate)
   createRoles(
     @Args(
       {
@@ -55,8 +49,8 @@ export class RolesResolver {
 
   @Query(() => [Role])
   @UsePipes(InputsQueryPipe)
-  @Permissions(Permission.RolesFindAll)
-  findAllRoles(
+  @Authorization(Permission.RolesSearch)
+  searchRoles(
     @Args('filters', { type: () => FilterRoleInput, nullable: true })
     filters?: IFilterToAQL[],
 
@@ -71,8 +65,8 @@ export class RolesResolver {
 
   @Query(() => Int)
   @UsePipes(InputsQueryPipe)
-  @Permissions(Permission.RolesCount)
-  countAllRoles(
+  @Authorization(Permission.RolesCount)
+  countRoles(
     @Args('filters', { type: () => FilterRoleInput, nullable: true })
     filters?: IFilterToAQL[],
   ) {
@@ -80,15 +74,15 @@ export class RolesResolver {
   }
 
   @Query(() => Role)
-  @Permissions(Permission.RolesFindOne)
-  findOneRole(@Args('_key', { type: () => ID }) _key: string) {
+  @Authorization(Permission.RolesFind)
+  findRole(@Args('_key', { type: () => ID }) _key: string) {
     return this.rolesService.findOne(_key);
   }
 
   @Mutation(() => [Role])
   @UsePipes(RolesUpdatePipe)
-  @Permissions(Permission.RolesUpdate)
-  updateRole(
+  @Authorization(Permission.RolesUpdate)
+  updateRoles(
     @Args(
       { name: 'update', type: () => [UpdateRoleInput] },
       new ParseArrayPipe({ items: UpdateRoleInput }),
@@ -99,8 +93,8 @@ export class RolesResolver {
   }
 
   @Mutation(() => [Role])
-  @Permissions(Permission.RolesRemove)
-  removeRole(
+  @Authorization(Permission.RolesRemove)
+  removeRoles(
     @Args(
       { name: 'remove', type: () => [RemoveRoleInput] },
       new ParseArrayPipe({ items: RemoveRoleInput }),
