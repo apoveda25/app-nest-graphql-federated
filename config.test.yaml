@@ -10,3 +10,10 @@ db:
     username: 'app_nest_test'
     password: 'secret'
     certs: []
+
+graphql:
+  introspection: true
+  playground: true
+  subscriptions: false
+  autoSchemaFile: true
+  sortSchema: true

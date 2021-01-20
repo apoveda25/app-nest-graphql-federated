@@ -2,37 +2,35 @@ import { Injectable } from '@nestjs/common';
 import { DocumentCollection } from 'arangojs/collection';
 import { ArangoDBService } from '../../database/arangodb/arangodb.service';
 import { ObjectToAQL } from '../../database/arangodb/object-to-aql';
-import { CreateScopeInput } from './dto/create-scope.input';
-import { Scope } from './entities/scope.entity';
-import { FilterRoleInput } from '../roles/dto/filter-role.input';
-import { SortRoleInput } from '../roles/dto/sort-role.input';
+import { ROLES_COLLECTION, ROLES_REMOVE_MESSAGE_ERROR } from './roles.contants';
+import { CreateRoleInput } from './dto/create-role.input';
+import { Role } from './entities/role.entity';
+import { FilterRoleInput } from './dto/filter-role.input';
+import { SortRoleInput } from './dto/sort-role.input';
 import { PaginationInput } from '../../commons/pagination.input';
-import {
-  SCOPES_REMOVE_MESSAGE_ERROR,
-  SCOPES_COLLECTION,
-} from './scopes.contants';
 import { aql } from 'arangojs';
-import { FilterScopeInput } from './dto/filter-scope.input';
-import { SortScopeInput } from './dto/sort-scope.input';
-import { UpdateScopeInput } from './dto/update-scope.input';
-import { RemoveScopeInput } from './dto/remove-scope.input';
+import { FilterScopeInput } from '../scopes/dto/filter-scope.input';
+import { SortScopeInput } from '../scopes/dto/sort-scope.input';
+import { Scope } from '../scopes/entities/scope.entity';
+import { UpdateRoleInput } from './dto/update-role.input';
+import { RemoveRoleInput } from './dto/remove-role.input';
 
 @Injectable()
-export class ScopesRepository {
+export class RolesRepository {
   private _collection: DocumentCollection;
 
   constructor(
     private readonly arangodbService: ArangoDBService,
     private readonly objectToAQL: ObjectToAQL,
   ) {
-    this._collection = this.arangodbService.collection(SCOPES_COLLECTION);
+    this._collection = this.arangodbService.collection(ROLES_COLLECTION);
   }
 
   private getCollection(name: string) {
     return this.arangodbService.collection(name);
   }
 
-  async create(documents: CreateScopeInput[]): Promise<Scope[]> {
+  async create(documents: CreateRoleInput[]): Promise<Role[]> {
     const trx = await this.arangodbService.beginTransaction({
       write: [this._collection],
     });
@@ -53,10 +51,10 @@ export class ScopesRepository {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: FilterScopeInput;
-    sort?: SortScopeInput;
+    filters?: FilterRoleInput;
+    sort?: SortRoleInput;
     pagination?: PaginationInput;
-  }): Promise<Scope[]> {
+  }): Promise<Role[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
       ${aql.join(this.objectToAQL.filtersToAql(filters))}
@@ -68,7 +66,7 @@ export class ScopesRepository {
     return await cursor.map((el) => el);
   }
 
-  async countAll(filters?: FilterScopeInput): Promise<number> {
+  async countAll(filters?: FilterRoleInput): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
@@ -80,7 +78,7 @@ export class ScopesRepository {
     return await cursor.reduce((acc: number, cur: number) => acc + cur, 0);
   }
 
-  async findAllInbound({
+  async findAllTransversal({
     edgeCollection,
     filtersVertexInit,
     sortVertexInit,
@@ -89,10 +87,10 @@ export class ScopesRepository {
     pagination = { offset: 0, count: 10 },
   }: {
     edgeCollection: string;
-    filtersVertexInit?: FilterScopeInput;
-    sortVertexInit?: SortScopeInput;
-    filtersVertexFinal?: FilterRoleInput;
-    sortVertexFinal?: SortRoleInput;
+    filtersVertexInit?: FilterRoleInput;
+    sortVertexInit?: SortRoleInput;
+    filtersVertexFinal?: FilterScopeInput;
+    sortVertexFinal?: SortScopeInput;
     pagination?: PaginationInput;
   }): Promise<Scope[]> {
     const cursor = await this.arangodbService.query(aql`
@@ -100,34 +98,34 @@ export class ScopesRepository {
       ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit))}
       ${aql.join(this.objectToAQL.sortToAql(sortVertexInit))}
 
-      FOR vertex, edge IN INBOUND doc._id ${this.getCollection(edgeCollection)}
+      FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(edgeCollection)}
       ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal))}
       ${aql.join(this.objectToAQL.sortToAql(sortVertexFinal))}
 
       ${this.objectToAQL.paginationToAql(pagination)}
       RETURN MERGE(doc, {${aql.literal(
         edgeCollection,
-      )}: MERGE(edge, { _from: vertex, _to: doc })})
+      )}: MERGE(edge, { _from: doc, _to: vertex })})
     `);
 
     return await cursor.map((el) => el);
   }
 
-  async countAllInbound({
+  async countAllTransversal({
     edgeCollection,
     filtersVertexInit,
     filtersVertexFinal,
   }: {
     edgeCollection: string;
-    filtersVertexInit?: FilterScopeInput;
-    filtersVertexFinal?: FilterRoleInput;
+    filtersVertexInit?: FilterRoleInput;
+    filtersVertexFinal?: FilterScopeInput;
   }): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit))}
 
-        FOR vertex, edge IN INBOUND doc._id ${this.getCollection(
+        FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(
           edgeCollection,
         )}
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal))}
@@ -139,7 +137,7 @@ export class ScopesRepository {
     return await cursor.reduce((acc: number, cur: number) => acc + cur, 0);
   }
 
-  async findOne(_key: string): Promise<Scope | unknown> {
+  async findOne(_key: string): Promise<Role | unknown> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
       FILTER doc._key == ${_key} || doc._id == ${_key}
@@ -149,7 +147,7 @@ export class ScopesRepository {
     return await cursor.reduce((acc: any, cur: any) => cur || acc, {});
   }
 
-  async update(documents: UpdateScopeInput[]): Promise<Scope[]> {
+  async update(documents: UpdateRoleInput[]): Promise<Role[]> {
     const trx = await this.arangodbService.beginTransaction({
       write: [this._collection],
     });
@@ -163,23 +161,24 @@ export class ScopesRepository {
     return docs.map((doc) => doc.new);
   }
 
-  // async remove(documents: RemoveScopeInput[]): Promise<Scope[]> {
+  // async remove(documents: RemoveRoleInput[]): Promise<Role[]> {
+  //   const AuthorizationByRole = this.getCollection('AuthorizationByRole');
   //   const PermissionsGranted = this.getCollection('PermissionsGranted');
   //   const trx = await this.arangodbService.beginTransaction({
   //     write: [this._collection],
-  //     read: [this._collection, PermissionsGranted],
+  //     read: [this._collection, PermissionsGranted, AuthorizationByRole],
   //   });
 
   //   const docs = await trx.step(() =>
   //     this.arangodbService.query(aql`
-  //       FOR vertex, edge IN ANY ${PermissionsGranted}
+  //       FOR vertex, edge IN ANY ${PermissionsGranted}, ${AuthorizationByRole}
   //       RETURN vertex
   //     `),
   //   );
 
   //   if (docs.reduce((acc: number, crr: number) => crr ?? acc + 1, 0)) {
   //     await trx.abort();
-  //     throw new Error(SCOPES_REMOVE_MESSAGE_ERROR);
+  //     throw new Error(ROLES_REMOVE_MESSAGE_ERROR);
   //   }
 
   //   const docsOld = await trx.step(() =>

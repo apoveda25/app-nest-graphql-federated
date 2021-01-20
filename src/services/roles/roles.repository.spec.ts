@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { QueryParser } from './query-parser';
+import { RolesRepository } from './roles.repository';
 
-describe('QueryParser', () => {
-  let provider: QueryParser;
+describe('RolesRepository', () => {
+  let provider: RolesRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [QueryParser],
+      providers: [RolesRepository],
     }).compile();
 
-    provider = module.get<QueryParser>(QueryParser);
+    provider = module.get<RolesRepository>(RolesRepository);
   });
 
   it('should be defined', () => {

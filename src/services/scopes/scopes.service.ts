@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { aql } from 'arangojs';
 import { CreateScopeInput } from './dto/create-scope.input';
 import { UpdateScopeInput } from './dto/update-scope.input';
 import { Scope } from './entities/scope.entity';
@@ -42,6 +41,7 @@ export class ScopesService {
   }
 
   async remove(documents: RemoveScopeInput[]): Promise<Scope[]> {
-    return this.scopesRepository.remove(documents);
+    // return this.scopesRepository.remove(documents);
+    return new Promise(() => documents);
   }
 }

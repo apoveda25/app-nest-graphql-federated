@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { PermissionsGranted } from '../../permissions-granted/entities/permissions-granted.entity';
+// import { PermissionsGranted } from '../../permissions-granted/entities/permissions-granted.entity';
 
 @ObjectType()
 export class Scope {
@@ -30,6 +30,6 @@ export class Scope {
   @Field(() => String)
   updatedAt: string;
 
-  @Field(() => [PermissionsGranted])
-  permissionsGranted: PermissionsGranted[];
+  // @Field(() => [PermissionsGranted])
+  // permissionsGranted: PermissionsGranted[];
 }

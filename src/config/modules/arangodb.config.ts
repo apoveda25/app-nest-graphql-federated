@@ -1,12 +1,9 @@
-import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Database as ArangoDB } from 'arangojs';
 import { readFileSync } from 'fs';
 
-@Injectable()
-export class Connection extends ArangoDB {
-  constructor(configService: ConfigService) {
-    super({
+export const arangodbConfig = (configService: ConfigService) => {
+  return {
+    arangodb: {
       url: configService.get('db.arangodb.urls'),
       databaseName: configService.get('db.arangodb.name'),
       auth: {
@@ -16,8 +13,8 @@ export class Connection extends ArangoDB {
       agentOptions: {
         ca: configService
           .get('db.arangodb.certs')
-          .map((cert) => readFileSync(cert)),
+          .map((cert: string) => readFileSync(cert)),
       },
-    });
-  }
-}
+    },
+  };
+};

@@ -21,18 +21,19 @@ import { ScopesCreatePipe } from './pipes/scopes-create.pipe';
 import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
 import { ScopesUpdatePipe } from './pipes/scopes-update.pipe';
-import { FilterPermissionsGrantedInput } from '../permissions-granted/dto/filter-permissions-granted.input';
-import { SortPermissionsGrantedInput } from '../permissions-granted/dto/sort-permissions-granted.input';
+// import { FilterPermissionsGrantedInput } from '../permissions-granted/dto/filter-permissions-granted.input';
+// import { SortPermissionsGrantedInput } from '../permissions-granted/dto/sort-permissions-granted.input';
+// import { PermissionsGrantedService } from '../permissions-granted/permissions-granted.service';
 import { FilterRoleInput } from '../roles/dto/filter-role.input';
 import { SortRoleInput } from '../roles/dto/sort-role.input';
-import { PermissionsGrantedService } from '../permissions-granted/permissions-granted.service';
 
 @Resolver(() => Scope)
 export class ScopesResolver {
-  constructor(
-    private readonly scopesService: ScopesService,
-    private readonly permissionsGrantedService: PermissionsGrantedService,
-  ) {}
+  // constructor(
+  //   private readonly scopesService: ScopesService,
+  //   private readonly permissionsGrantedService: PermissionsGrantedService,
+  // ) {}
+  constructor(private readonly scopesService: ScopesService) {}
 
   @Mutation(() => [Scope])
   @UsePipes(ScopesCreatePipe)
@@ -105,44 +106,44 @@ export class ScopesResolver {
     return this.scopesService.remove(remove);
   }
 
-  @ResolveField()
-  async permissionsGranted(
-    @Parent() scope: Scope,
+  // @ResolveField()
+  // async permissionsGranted(
+  //   @Parent() scope: Scope,
 
-    @Args('filtersEdge', {
-      type: () => FilterPermissionsGrantedInput,
-      nullable: true,
-    })
-    filtersEdge?: FilterPermissionsGrantedInput,
+  //   @Args('filtersEdge', {
+  //     type: () => FilterPermissionsGrantedInput,
+  //     nullable: true,
+  //   })
+  //   filtersEdge?: FilterPermissionsGrantedInput,
 
-    @Args('sortEdge', {
-      type: () => SortPermissionsGrantedInput,
-      nullable: true,
-    })
-    sortEdge?: SortPermissionsGrantedInput,
+  //   @Args('sortEdge', {
+  //     type: () => SortPermissionsGrantedInput,
+  //     nullable: true,
+  //   })
+  //   sortEdge?: SortPermissionsGrantedInput,
 
-    @Args('filtersVertex', {
-      type: () => FilterRoleInput,
-      nullable: true,
-    })
-    filtersVertex?: FilterRoleInput,
+  //   @Args('filtersVertex', {
+  //     type: () => FilterRoleInput,
+  //     nullable: true,
+  //   })
+  //   filtersVertex?: FilterRoleInput,
 
-    @Args('sortVertex', {
-      type: () => SortRoleInput,
-      nullable: true,
-    })
-    sortVertex?: SortRoleInput,
+  //   @Args('sortVertex', {
+  //     type: () => SortRoleInput,
+  //     nullable: true,
+  //   })
+  //   sortVertex?: SortRoleInput,
 
-    @Args('pagination', { type: () => PaginationInput, nullable: true })
-    pagination?: PaginationInput,
-  ) {
-    return this.permissionsGrantedService.inboundOneLevel({
-      _id: scope._id,
-      filtersEdge,
-      sortEdge,
-      filtersVertex,
-      sortVertex,
-      pagination,
-    });
-  }
+  //   @Args('pagination', { type: () => PaginationInput, nullable: true })
+  //   pagination?: PaginationInput,
+  // ) {
+  //   return this.permissionsGrantedService.inboundOneLevel({
+  //     _id: scope._id,
+  //     filtersEdge,
+  //     sortEdge,
+  //     filtersVertex,
+  //     sortVertex,
+  //     pagination,
+  //   });
+  // }
 }
