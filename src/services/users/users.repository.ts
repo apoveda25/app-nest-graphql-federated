@@ -4,15 +4,13 @@ import type { DocumentCollection } from 'arangojs/collection';
 import { ArangoDBService } from '../../database/arangodb/arangodb.service';
 import { User } from './entities/user.entity';
 import { CreateUserHash } from './dto/create-user-hash';
-import { FilterUserInput } from './dto/filter-user.input';
-import { SortUserInput } from './dto/sort-user.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { ObjectToAQL } from '../../database/arangodb/object-to-aql';
-import { FilterRoleInput } from '../roles/dto/filter-role.input';
-import { SortRoleInput } from '../roles/dto/sort-role.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { RemoveUserInput } from './dto/remove-user.input';
 import { USERS_REMOVE_MESSAGE_ERROR, USERS_COLLECTION } from './users.contants';
+import { IFilterToAQL } from '../../database/arangodb/object-to-aql.interface';
+import { ISortToAQL } from '../../database/arangodb/object-to-aql.interface';
 
 @Injectable()
 export class UsersRepository {
@@ -50,14 +48,14 @@ export class UsersRepository {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: FilterUserInput;
-    sort?: SortUserInput;
+    filters?: IFilterToAQL[];
+    sort?: ISortToAQL[];
     pagination?: PaginationInput;
   }): Promise<User[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
-      ${aql.join(this.objectToAQL.filtersToAql(filters))}
-      ${aql.join(this.objectToAQL.sortToAql(sort))}
+      ${aql.join(this.objectToAQL.filtersToAql(filters, 'doc'))}
+      ${aql.join(this.objectToAQL.sortToAql(sort, 'doc'))}
       ${this.objectToAQL.paginationToAql(pagination)}
       RETURN doc
     `);
@@ -65,11 +63,11 @@ export class UsersRepository {
     return await cursor.map((el) => el);
   }
 
-  async countAll(filters?: FilterUserInput): Promise<number> {
+  async countAll(filters?: IFilterToAQL[]): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
-        ${aql.join(this.objectToAQL.filtersToAql(filters))}
+        ${aql.join(this.objectToAQL.filtersToAql(filters, 'doc'))}
         RETURN doc
       )
     `);
@@ -79,27 +77,38 @@ export class UsersRepository {
 
   async findAllTransversal({
     edgeCollection,
+    direction,
     filtersVertexInit,
     sortVertexInit,
+    filtersEdge,
+    sortEdge,
     filtersVertexFinal,
     sortVertexFinal,
     pagination = { offset: 0, count: 10 },
   }: {
     edgeCollection: string;
-    filtersVertexInit?: FilterUserInput;
-    sortVertexInit?: SortUserInput;
-    filtersVertexFinal?: FilterRoleInput;
-    sortVertexFinal?: SortRoleInput;
+    direction: string;
+    filtersVertexInit?: IFilterToAQL[];
+    sortVertexInit?: ISortToAQL[];
+    filtersEdge?: IFilterToAQL[];
+    sortEdge?: ISortToAQL[];
+    filtersVertexFinal?: IFilterToAQL[];
+    sortVertexFinal?: ISortToAQL[];
     pagination?: PaginationInput;
   }): Promise<User[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
-      ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit))}
-      ${aql.join(this.objectToAQL.sortToAql(sortVertexInit))}
+      ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
+      ${aql.join(this.objectToAQL.sortToAql(sortVertexInit, 'doc'))}
 
-      FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(edgeCollection)}
-      ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal))}
-      ${aql.join(this.objectToAQL.sortToAql(sortVertexFinal))}
+      FOR vertex, edge IN ${direction} doc._id ${this.getCollection(
+      edgeCollection,
+    )}
+      ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
+      ${aql.join(this.objectToAQL.sortToAql(sortEdge, 'edge'))}
+
+      ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal, 'vertex'))}
+      ${aql.join(this.objectToAQL.sortToAql(sortVertexFinal, 'vertex'))}
 
       ${this.objectToAQL.paginationToAql(pagination)}
       RETURN MERGE(doc, {${aql.literal(
@@ -112,22 +121,28 @@ export class UsersRepository {
 
   async countAllTransversal({
     edgeCollection,
+    direction,
     filtersVertexInit,
+    filtersEdge,
     filtersVertexFinal,
   }: {
     edgeCollection: string;
-    filtersVertexInit?: FilterUserInput;
-    filtersVertexFinal?: FilterRoleInput;
+    direction: string;
+    filtersVertexInit?: IFilterToAQL[];
+    filtersEdge?: IFilterToAQL[];
+    filtersVertexFinal?: IFilterToAQL[];
   }): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
-        ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit))}
+        ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
 
-        FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(
-          edgeCollection,
-        )}
-        ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal))}
+        FOR vertex, edge IN ${direction} doc._id ${this.getCollection(
+      edgeCollection,
+    )}
+        ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
+
+        ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal, 'vertex'))}
 
         RETURN doc
       )

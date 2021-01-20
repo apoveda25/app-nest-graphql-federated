@@ -21,24 +21,20 @@ import { RolesCreatePipe } from './pipes/roles-create.pipe';
 import { RolesUpdatePipe } from './pipes/roles-update.pipe';
 import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
-import { FilterUserInput } from '../users/dto/filter-user.input';
-import { SortUserInput } from '../users/dto/sort-user.input';
 // import { FilterAuthorizationByRoleInput } from '../authorization-by-role/dto/filter-authorization-by-role.input';
 // import { SortAuthorizationByRoleInput } from '../authorization-by-role/dto/sort-authorization-by-role.input';
 // import { AuthorizationByRoleService } from '../authorization-by-role/authorization-by-role.service';
 // import { PermissionsGrantedService } from '../permissions-granted/permissions-granted.service';
 // import { FilterPermissionsGrantedInput } from '../permissions-granted/dto/filter-permissions-granted.input';
 // import { SortPermissionsGrantedInput } from '../permissions-granted/dto/sort-permissions-granted.input';
-import { FilterScopeInput } from '../scopes/dto/filter-scope.input';
-import { SortScopeInput } from '../scopes/dto/sort-scope.input';
+import {
+  IFilterToAQL,
+  ISortToAQL,
+} from '../../database/arangodb/object-to-aql.interface';
+import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
 
 @Resolver(() => Role)
 export class RolesResolver {
-  // constructor(
-  //   private readonly rolesService: RolesService,
-  //   private readonly authorizationByRoleService: AuthorizationByRoleService,
-  //   private readonly permissionsGrantedService: PermissionsGrantedService,
-  // ) {}
   constructor(private readonly rolesService: RolesService) {}
 
   @Mutation(() => [Role])
@@ -58,13 +54,14 @@ export class RolesResolver {
   }
 
   @Query(() => [Role])
+  @UsePipes(InputsQueryPipe)
   @Permissions(Permission.RolesFindAll)
   findAllRoles(
     @Args('filters', { type: () => FilterRoleInput, nullable: true })
-    filters?: FilterRoleInput,
+    filters?: IFilterToAQL[],
 
     @Args('sort', { type: () => SortRoleInput, nullable: true })
-    sort?: SortRoleInput,
+    sort?: ISortToAQL[],
 
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination?: PaginationInput,
@@ -73,10 +70,11 @@ export class RolesResolver {
   }
 
   @Query(() => Int)
+  @UsePipes(InputsQueryPipe)
   @Permissions(Permission.RolesCount)
   countAllRoles(
     @Args('filters', { type: () => FilterRoleInput, nullable: true })
-    filters?: FilterRoleInput,
+    filters?: IFilterToAQL[],
   ) {
     return this.rolesService.countAll(filters);
   }

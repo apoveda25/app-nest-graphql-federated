@@ -6,6 +6,8 @@ import { FilterBooleanInput } from './filter-boolean.input';
 import { FilterIntInput } from './filter-int.input';
 import { FilterFloatInput } from './filter-float.input';
 import { FilterDatetimeInput } from './filter-datetime.input';
+import { InputTransform } from './utils/input-transform';
+import { InputsQueryPipe } from './pipes/inputs-query.pipe';
 
 @Module({
   providers: [
@@ -16,6 +18,10 @@ import { FilterDatetimeInput } from './filter-datetime.input';
     FilterIntInput,
     FilterFloatInput,
     FilterDatetimeInput,
+    InputTransform,
+    InputTransform,
+    InputsQueryPipe,
   ],
+  exports: [InputTransform, InputsQueryPipe],
 })
 export class CommonsModule {}

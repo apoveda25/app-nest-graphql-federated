@@ -23,18 +23,14 @@ import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
 import { UsersCreatePipe } from './pipes/users-create.pipe';
 import { UsersUpdatePipe } from './pipes/users-update.pipe';
-// import { AuthorizationByRoleService } from '../authorization-by-role/authorization-by-role.service';
-// import { FilterAuthorizationByRoleInput } from '../authorization-by-role/dto/filter-authorization-by-role.input';
-// import { SortAuthorizationByRoleInput } from '../authorization-by-role/dto/sort-authorization-by-role.input';
-import { FilterRoleInput } from '../roles/dto/filter-role.input';
-import { SortRoleInput } from '../roles/dto/sort-role.input';
+import {
+  IFilterToAQL,
+  ISortToAQL,
+} from '../../database/arangodb/object-to-aql.interface';
+import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
 
 @Resolver(() => User)
 export class UsersResolver {
-  // constructor(
-  //   private readonly usersService: UsersService,
-  //   private readonly authorizationByRoleService: AuthorizationByRoleService,
-  // ) {}
   constructor(private readonly usersService: UsersService) {}
 
   @Mutation(() => [User])
@@ -49,19 +45,20 @@ export class UsersResolver {
       new ParseArrayPipe({ items: CreateUserInput }),
       new ParseArrayPipe({ items: CreateUserHash }),
     )
-    createInput: CreateUserHash[],
+    create: CreateUserHash[],
   ) {
-    return this.usersService.create(createInput);
+    return this.usersService.create(create);
   }
 
   @Query(() => [User])
+  @UsePipes(InputsQueryPipe)
   @Permissions(Permission.UsersFindAll)
   findAllUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
-    filters?: FilterUserInput,
+    filters?: IFilterToAQL[],
 
     @Args('sort', { type: () => SortUserInput, nullable: true })
-    sort?: SortUserInput,
+    sort?: ISortToAQL[],
 
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination?: PaginationInput,
@@ -70,10 +67,11 @@ export class UsersResolver {
   }
 
   @Query(() => Int)
+  @UsePipes(InputsQueryPipe)
   @Permissions(Permission.UsersCount)
   countAllUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
-    filters?: FilterUserInput,
+    filters?: IFilterToAQL[],
   ) {
     return this.usersService.countAll(filters);
   }

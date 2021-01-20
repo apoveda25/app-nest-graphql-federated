@@ -6,6 +6,7 @@ import { DatabaseModule } from '../../database/database.module';
 import { ScopesRepository } from './scopes.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { arangodbConfig } from '../../config/modules/arangodb.config';
+import { CommonsModule } from '../../commons/commons.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { arangodbConfig } from '../../config/modules/arangodb.config';
       inject: [ConfigService],
       useFactory: arangodbConfig,
     }),
+    CommonsModule,
     // forwardRef(() => PermissionsGrantedModule),
   ],
   providers: [ScopesResolver, ScopesService, ScopesRepository],

@@ -5,9 +5,11 @@ export interface IFilter {
 
 export interface IFilterToAQL extends IFilter {
   key: string;
+  separator: string;
 }
 
-export interface IContextFilterFirst extends IFilterToAQL {
+export interface IContextFilterFirst extends IFilter {
+  key: string;
   node: string;
 }
 
@@ -16,9 +18,13 @@ export interface IContextFilterLast extends IFilterToAQL {
   separator: string;
 }
 
-export interface ISort {
+export interface ISortToAQL {
+  value: string;
+  sorting: boolean;
+}
+
+export interface IContextSort extends ISortToAQL {
   node: string;
-  key: string;
 }
 
 export interface IPagination {

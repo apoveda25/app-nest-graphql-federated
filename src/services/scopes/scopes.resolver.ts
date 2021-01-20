@@ -21,18 +21,13 @@ import { ScopesCreatePipe } from './pipes/scopes-create.pipe';
 import { Permissions } from '../../authorization/permission.decorator';
 import { Permission } from '../../authorization/permission';
 import { ScopesUpdatePipe } from './pipes/scopes-update.pipe';
-// import { FilterPermissionsGrantedInput } from '../permissions-granted/dto/filter-permissions-granted.input';
-// import { SortPermissionsGrantedInput } from '../permissions-granted/dto/sort-permissions-granted.input';
-// import { PermissionsGrantedService } from '../permissions-granted/permissions-granted.service';
-import { FilterRoleInput } from '../roles/dto/filter-role.input';
-import { SortRoleInput } from '../roles/dto/sort-role.input';
-
+import {
+  IFilterToAQL,
+  ISortToAQL,
+} from '../../database/arangodb/object-to-aql.interface';
+import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
 @Resolver(() => Scope)
 export class ScopesResolver {
-  // constructor(
-  //   private readonly scopesService: ScopesService,
-  //   private readonly permissionsGrantedService: PermissionsGrantedService,
-  // ) {}
   constructor(private readonly scopesService: ScopesService) {}
 
   @Mutation(() => [Scope])
@@ -52,13 +47,14 @@ export class ScopesResolver {
   }
 
   @Query(() => [Scope])
+  @UsePipes(InputsQueryPipe)
   @Permissions(Permission.ScopesFindAll)
   findAllScopes(
     @Args('filters', { type: () => FilterScopeInput, nullable: true })
-    filters?: FilterScopeInput,
+    filters?: IFilterToAQL[],
 
     @Args('sort', { type: () => SortScopeInput, nullable: true })
-    sort?: SortScopeInput,
+    sort?: ISortToAQL[],
 
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination?: PaginationInput,
@@ -67,10 +63,11 @@ export class ScopesResolver {
   }
 
   @Query(() => Int)
+  @UsePipes(InputsQueryPipe)
   @Permissions(Permission.ScopesCount)
   countAllScopes(
     @Args('filters', { type: () => FilterScopeInput, nullable: true })
-    filters?: FilterScopeInput,
+    filters?: IFilterToAQL[],
   ) {
     return this.scopesService.countAll(filters);
   }

@@ -7,6 +7,10 @@ import { SortRoleInput } from './dto/sort-role.input';
 import { UpdateRoleInput } from './dto/update-role.input';
 import { Role } from './entities/role.entity';
 import { RolesRepository } from './roles.repository';
+import {
+  IFilterToAQL,
+  ISortToAQL,
+} from '../../database/arangodb/object-to-aql.interface';
 
 @Injectable()
 export class RolesService {
@@ -21,14 +25,14 @@ export class RolesService {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: FilterRoleInput;
-    sort?: SortRoleInput;
+    filters?: IFilterToAQL[];
+    sort?: ISortToAQL[];
     pagination?: PaginationInput;
   }): Promise<Role[]> {
     return this.rolesRepository.findAll({ filters, sort, pagination });
   }
 
-  async countAll(filters?: FilterRoleInput): Promise<number> {
+  async countAll(filters?: IFilterToAQL[]): Promise<number> {
     return this.countAll(filters);
   }
 

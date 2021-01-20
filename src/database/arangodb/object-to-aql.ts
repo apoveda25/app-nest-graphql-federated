@@ -1,60 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { GeneratedAqlQuery, aql } from 'arangojs/aql';
 import {
-  IFilter,
   IFilterToAQL,
   IContextFilterFirst,
   IContextFilterLast,
-  ISort,
+  ISortToAQL,
+  IContextSort,
   IPagination,
 } from './object-to-aql.interface';
 
 @Injectable()
 export class ObjectToAQL {
-  public filtersToAql(filters: any, node = 'doc'): GeneratedAqlQuery[] {
-    return this.transformFiltersToArrayFilter(
-      filters,
-    ).map((filter: IFilterToAQL, index) =>
+  public filtersToAql(
+    filters: IFilterToAQL[],
+    node: string,
+  ): GeneratedAqlQuery[] {
+    return filters.map(({ separator, key, operator, value }, index) =>
       index
-        ? this.aqlLastFilter({ node, separator: filters.separator, ...filter })
-        : this.aqlFirstFilter({ node, ...filter }),
+        ? this.aqlLastFilter({ node, separator, key, operator, value })
+        : this.aqlFirstFilter({ node, key, operator, value }),
     );
   }
 
-  public sortToAql(sort: any, node = 'doc'): GeneratedAqlQuery[] {
-    const aqlSort = this.transformSortToArray(sort).map(
-      (key: string, index: number) => {
-        return index
-          ? this.aqlMediumSort({ node, key })
-          : this.aqlFirstSort({ node, key });
-      },
-    );
-
-    if (aqlSort.length) aqlSort.push(this.aqlLastSort(sort.sort));
-
-    return aqlSort;
+  public sortToAql(sort: ISortToAQL[], node: string): GeneratedAqlQuery[] {
+    return sort.map((el, index) => {
+      return index
+        ? this.aqlLastSort({ ...el, node })
+        : this.aqlFirstSort({ ...el, node });
+    });
   }
 
   public paginationToAql({ offset, count }: IPagination): GeneratedAqlQuery {
     return aql`LIMIT ${offset}, ${count}`;
   }
 
-  private transformFiltersToArrayFilter(filters: any = {}) {
-    const filtersToAQL: IFilterToAQL[] = [];
-
-    Object.keys(filters)
-      .filter((key: string) => key !== 'separator')
-      .map((key: string) => {
-        filters[key].map((filter: IFilter) =>
-          filtersToAQL.push({ key, ...filter }),
-        );
-      });
-
-    return filtersToAQL;
-  }
-
   private aqlFirstFilter({ node, key, operator, value }: IContextFilterFirst) {
-    return aql`FILTER ${node}.${aql.literal(key)} ${aql.literal(
+    return aql`FILTER ${aql.literal(node)}.${key} ${aql.literal(
       operator,
     )} ${value} `;
   }
@@ -66,26 +47,14 @@ export class ObjectToAQL {
     operator,
     value,
   }: IContextFilterLast) {
-    return aql` ${aql.literal(separator)} ${node}.${aql.literal(
-      key,
-    )} ${aql.literal(operator)} ${value} `;
+    return aql` ${separator} ${aql.literal(node)}.${key} ${operator} ${value} `;
   }
 
-  private transformSortToArray(sort: any = {}) {
-    return Object.keys(sort).filter(
-      (key: string) => key !== 'sort' && sort[key],
-    );
+  private aqlFirstSort({ node, value }: IContextSort) {
+    return aql`SORT ${aql.literal(node)}.${value}`;
   }
 
-  private aqlFirstSort({ node, key }: ISort) {
-    return aql`SORT ${node}.${aql.literal(key)}`;
-  }
-
-  private aqlMediumSort({ node, key }: ISort) {
-    return aql`, ${node}.${aql.literal(key)}`;
-  }
-
-  private aqlLastSort(sort: string) {
-    return aql` ${aql.literal(sort)}`;
+  private aqlLastSort({ node, value, sorting }: IContextSort) {
+    return sorting ? aql` ${value}` : aql`, ${aql.literal(node)}.${value}`;
   }
 }

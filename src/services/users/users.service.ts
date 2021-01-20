@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { FilterUserInput } from './dto/filter-user.input';
-import { SortUserInput } from './dto/sort-user.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { CreateUserHash } from './dto/create-user-hash';
 import { UpdateUserInput } from './dto/update-user.input';
 import { RemoveUserInput } from './dto/remove-user.input';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
+import { IFilterToAQL } from '../../database/arangodb/object-to-aql.interface';
+import { ISortToAQL } from '../../database/arangodb/object-to-aql.interface';
 
 @Injectable()
 export class UsersService {
@@ -21,14 +21,14 @@ export class UsersService {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: FilterUserInput;
-    sort?: SortUserInput;
+    filters?: IFilterToAQL[];
+    sort?: ISortToAQL[];
     pagination?: PaginationInput;
   }): Promise<User[]> {
     return this.usersRepository.findAll({ filters, sort, pagination });
   }
 
-  async countAll(filters?: FilterUserInput): Promise<number> {
+  async countAll(filters?: IFilterToAQL[]): Promise<number> {
     return this.usersRepository.countAll(filters);
   }
 

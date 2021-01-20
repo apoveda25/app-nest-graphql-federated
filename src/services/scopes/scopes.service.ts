@@ -3,10 +3,13 @@ import { CreateScopeInput } from './dto/create-scope.input';
 import { UpdateScopeInput } from './dto/update-scope.input';
 import { Scope } from './entities/scope.entity';
 import { FilterScopeInput } from './dto/filter-scope.input';
-import { SortScopeInput } from './dto/sort-scope.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveScopeInput } from './dto/remove-scope.input';
 import { ScopesRepository } from './scopes.repository';
+import {
+  IFilterToAQL,
+  ISortToAQL,
+} from '../../database/arangodb/object-to-aql.interface';
 
 @Injectable()
 export class ScopesService {
@@ -21,14 +24,14 @@ export class ScopesService {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: FilterScopeInput;
-    sort?: SortScopeInput;
+    filters?: IFilterToAQL[];
+    sort?: ISortToAQL[];
     pagination?: PaginationInput;
   }): Promise<Scope[]> {
     return this.scopesRepository.findAll({ filters, sort, pagination });
   }
 
-  async countAll(filters?: FilterScopeInput): Promise<number> {
+  async countAll(filters?: IFilterToAQL[]): Promise<number> {
     return this.scopesRepository.countAll(filters);
   }
 
