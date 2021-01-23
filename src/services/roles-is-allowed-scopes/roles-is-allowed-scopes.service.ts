@@ -1,26 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRolesIsAllowedScopeInput } from './dto/create-roles-is-allowed-scope.input';
 import { UpdateRolesIsAllowedScopeInput } from './dto/update-roles-is-allowed-scope.input';
+import { RolesIsAllowedScopesRepository } from './roles-is-allowed-scopes.repository';
+import {
+  IFilterToAQL,
+  ISortToAQL,
+} from '../../database/arangodb/object-to-aql.interface';
+import { PaginationInput } from '../../commons/pagination.input';
+import { RolesIsAllowedScope } from './entities/roles-is-allowed-scope.entity';
+import { RemoveRolesIsAllowedScopeInput } from './dto/remove-roles-is-allowed-scope.input';
 
 @Injectable()
 export class RolesIsAllowedScopesService {
-  create(createRolesIsAllowedScopeInput: CreateRolesIsAllowedScopeInput) {
-    return 'This action adds a new rolesIsAllowedScope';
+  constructor(private readonly repository: RolesIsAllowedScopesRepository) {}
+
+  async create(documents: CreateRolesIsAllowedScopeInput[]) {
+    return this.repository.create(documents);
   }
 
-  findAll() {
-    return `This action returns all rolesIsAllowedScopes`;
+  async findAll({
+    filters,
+    sort,
+    pagination = { offset: 0, count: 10 },
+  }: {
+    filters?: IFilterToAQL[];
+    sort?: ISortToAQL[];
+    pagination?: PaginationInput;
+  }): Promise<RolesIsAllowedScope[]> {
+    return this.repository.findAll({ filters, sort, pagination });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rolesIsAllowedScope`;
+  async countAll(filters?: IFilterToAQL[]): Promise<number> {
+    return this.repository.countAll(filters);
   }
 
-  update(id: number, updateRolesIsAllowedScopeInput: UpdateRolesIsAllowedScopeInput) {
-    return `This action updates a #${id} rolesIsAllowedScope`;
+  async findOne(_key: string): Promise<RolesIsAllowedScope | unknown> {
+    return this.repository.findOne(_key);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} rolesIsAllowedScope`;
+  async update(
+    documents: UpdateRolesIsAllowedScopeInput[],
+  ): Promise<RolesIsAllowedScope[]> {
+    return this.repository.update(documents);
+  }
+
+  async remove(
+    documents: RemoveRolesIsAllowedScopeInput[],
+  ): Promise<RolesIsAllowedScope[]> {
+    return this.repository.remove(documents);
   }
 }

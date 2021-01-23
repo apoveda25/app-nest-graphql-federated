@@ -20,6 +20,13 @@ export enum Permission {
   RolesSearch = 'roles_search',
   RolesCount = 'roles_count',
 
+  RolesIsAllowedScopesCreate = 'roles_is_allowed_scopes_create',
+  RolesIsAllowedScopesUpdate = 'roles_is_allowed_scopes_update',
+  RolesIsAllowedScopesRemove = 'roles_is_allowed_scopes_remove',
+  RolesIsAllowedScopesFind = 'roles_is_allowed_scopes_find',
+  RolesIsAllowedScopesSearch = 'roles_is_allowed_scopes_search',
+  RolesIsAllowedScopesCount = 'roles_is_allowed_scopes_count',
+
   ScopesCreate = 'scopes_create',
   ScopesUpdate = 'scopes_update',
   ScopesRemove = 'scopes_remove',
