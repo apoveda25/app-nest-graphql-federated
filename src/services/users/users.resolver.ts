@@ -108,7 +108,7 @@ export class UsersResolver {
   }
 
   // @ResolveField()
-  // async authorizationByRole(
+  // async actsAs(
   //   @Parent() user: User,
 
   //   @Args('filtersEdge', {

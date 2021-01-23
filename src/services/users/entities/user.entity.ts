@@ -1,11 +1,4 @@
-import {
-  Directive,
-  ObjectType,
-  Field,
-  ID,
-  HideField,
-  Args,
-} from '@nestjs/graphql';
+import { Directive, ObjectType, Field, ID, HideField } from '@nestjs/graphql';
 // import { AuthorizationByRole } from '../../authorization-by-role/entities/authorization-by-role.entity';
 
 @ObjectType()

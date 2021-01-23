@@ -1,33 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { aql } from 'arangojs';
 import { DocumentCollection } from 'arangojs/collection';
 import { ArangoDBService } from '../../database/arangodb/arangodb.service';
-import { User } from './entities/user.entity';
-import { CreateUserHash } from './dto/create-user-hash';
-import { PaginationInput } from '../../commons/pagination.input';
 import { ObjectToAQL } from '../../database/arangodb/object-to-aql';
-import { UpdateUserInput } from './dto/update-user.input';
-import { RemoveUserInput } from './dto/remove-user.input';
-import { USERS_REMOVE_MESSAGE_ERROR, USERS_COLLECTION } from './users.contants';
-import { IFilterToAQL } from '../../database/arangodb/object-to-aql.interface';
-import { ISortToAQL } from '../../database/arangodb/object-to-aql.interface';
+import { USERS_ACTS_AS_ROLES_COLLECTION } from './users-acts-as-roles.contants';
+import { CreateUsersActsAsRoleInput } from './dto/create-users-acts-as-role.input';
+import { UsersActsAsRole } from './entities/users-acts-as-role.entity';
+import {
+  IFilterToAQL,
+  ISortToAQL,
+} from '../../database/arangodb/object-to-aql.interface';
+import { PaginationInput } from '../../commons/pagination.input';
+import { aql } from 'arangojs/aql';
+import { UpdateUsersActsAsRoleInput } from './dto/update-users-acts-as-role.input';
+import { RemoveUsersActsAsRoleInput } from './dto/remove-users-acts-as-role.input';
+import { errorUsersActsAsRolesRemove } from './users-acts-as-roles.exception';
 
 @Injectable()
-export class UsersRepository {
+export class UsersActsAsRolesRepository {
   private _collection: DocumentCollection;
 
   constructor(
     private readonly arangodbService: ArangoDBService,
     private readonly objectToAQL: ObjectToAQL,
   ) {
-    this._collection = this.arangodbService.collection(USERS_COLLECTION);
+    this._collection = this.arangodbService.collection(
+      USERS_ACTS_AS_ROLES_COLLECTION,
+    );
   }
 
   private getCollection(name: string) {
     return this.arangodbService.collection(name);
   }
 
-  async create(documents: CreateUserHash[]): Promise<User[]> {
+  async create(
+    documents: CreateUsersActsAsRoleInput[],
+  ): Promise<UsersActsAsRole[]> {
     const trx = await this.arangodbService.beginTransaction({
       write: [this._collection],
     });
@@ -51,7 +58,7 @@ export class UsersRepository {
     filters?: IFilterToAQL[];
     sort?: ISortToAQL[];
     pagination?: PaginationInput;
-  }): Promise<User[]> {
+  }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
       ${aql.join(this.objectToAQL.filtersToAql(filters, 'doc'))}
@@ -95,7 +102,7 @@ export class UsersRepository {
     filtersVertexFinal?: IFilterToAQL[];
     sortVertexFinal?: ISortToAQL[];
     pagination?: PaginationInput;
-  }): Promise<User[]> {
+  }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
       ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
@@ -151,7 +158,7 @@ export class UsersRepository {
     return await cursor.reduce((acc: number, cur: number) => acc + cur, 0);
   }
 
-  async findOne(_key: string): Promise<User | unknown> {
+  async findOne(_key: string): Promise<UsersActsAsRole | unknown> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
       FILTER doc._key == ${_key} || doc._id == ${_key}
@@ -161,7 +168,9 @@ export class UsersRepository {
     return await cursor.reduce((acc: any, cur: any) => cur || acc, {});
   }
 
-  async update(documents: UpdateUserInput[]): Promise<User[]> {
+  async update(
+    documents: UpdateUsersActsAsRoleInput[],
+  ): Promise<UsersActsAsRole[]> {
     const trx = await this.arangodbService.beginTransaction({
       write: [this._collection],
     });
@@ -175,7 +184,9 @@ export class UsersRepository {
     return docs.map((doc) => doc.new);
   }
 
-  async remove(documents: RemoveUserInput[]): Promise<User[]> {
+  async remove(
+    documents: RemoveUsersActsAsRoleInput[],
+  ): Promise<UsersActsAsRole[]> {
     const AuthorizationByRole = this.getCollection('AuthorizationByRole');
     const trx = await this.arangodbService.beginTransaction({
       write: [this._collection],
@@ -191,7 +202,7 @@ export class UsersRepository {
 
     if (docs.reduce((acc: number, crr: number) => crr ?? acc + 1, 0)) {
       await trx.abort();
-      throw new Error(USERS_REMOVE_MESSAGE_ERROR);
+      throw errorUsersActsAsRolesRemove;
     }
 
     const docsOld = await trx.step(() =>

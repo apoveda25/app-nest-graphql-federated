@@ -10,6 +10,8 @@ import { RolesModule } from './services/roles/roles.module';
 import { ScopesModule } from './services/scopes/scopes.module';
 import { graphqlConfig } from './config/modules/graphql.config';
 import { AuthorizationGuard } from './authorization/authorization.guard';
+import { RolesIsAllowedScopesModule } from './services/roles-is-allowed-scopes/roles-is-allowed-scopes.module';
+import { UsersActsAsRolesModule } from './services/users-acts-as-roles/users-acts-as-roles.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { AuthorizationGuard } from './authorization/authorization.guard';
     UsersModule,
     RolesModule,
     ScopesModule,
+    RolesIsAllowedScopesModule,
+    UsersActsAsRolesModule,
   ],
   providers: [
     {

@@ -33,7 +33,7 @@ export class UsersService {
   }
 
   async findOne(_key: string): Promise<User | unknown> {
-    return this.findOne(_key);
+    return this.usersRepository.findOne(_key);
   }
 
   async update(documents: UpdateUserInput[]): Promise<User[]> {
