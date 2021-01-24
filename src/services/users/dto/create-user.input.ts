@@ -1,4 +1,10 @@
 import { InputType, ID, Field, HideField } from '@nestjs/graphql';
+import { CREATED_REGEX } from '../../../commons/commons.constants';
+import {
+  KEY_REGEX,
+  WORD_REGEX,
+  PASSWORD_REGEX,
+} from '../../../commons/commons.constants';
 import {
   IsString,
   IsEmail,
@@ -20,7 +26,7 @@ const emailCodeGenerate = (lenght: number) => {
 @InputType()
 export class CreateUserInput {
   @Field(() => ID, { nullable: true })
-  @Matches(/^[\w]+$/)
+  @Matches(KEY_REGEX)
   @IsOptional()
   _key?: string;
 
@@ -36,12 +42,12 @@ export class CreateUserInput {
   emailCode = emailCodeGenerate(6);
 
   @Field(() => String)
-  @Matches(/^[\w]+$/)
+  @Matches(WORD_REGEX)
   @IsString()
   username: string;
 
   @Field(() => String)
-  @Matches(/^[\w.!@#$%^&*_+='",:;|<>]{8,20}$/)
+  @Matches(PASSWORD_REGEX)
   @IsString()
   password: string;
 
@@ -56,7 +62,10 @@ export class CreateUserInput {
   active: boolean;
 
   @HideField()
-  @Matches(/^Users\/[\w]+$/)
+  deleted = false;
+
+  @HideField()
+  @Matches(CREATED_REGEX)
   @IsString()
   createdBy: string;
 
@@ -64,8 +73,14 @@ export class CreateUserInput {
   updatedBy = '';
 
   @HideField()
+  deletedBy = '';
+
+  @HideField()
   createdAt = new Date().toISOString();
 
   @HideField()
   updatedAt = '';
+
+  @HideField()
+  deletedAt = '';
 }

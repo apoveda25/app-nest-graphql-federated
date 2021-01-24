@@ -1,14 +1,20 @@
-import { CreateRoleInput } from './create-role.input';
-import { InputType, Field, ID, PartialType, HideField } from '@nestjs/graphql';
+import { InputType, Field, ID, HideField } from '@nestjs/graphql';
 import { IsBoolean, IsOptional, IsString, Matches } from 'class-validator';
+import {
+  KEY_REGEX,
+  NAME_REGEX,
+  UPDATED_REGEX,
+} from '../../../commons/commons.constants';
 
 @InputType()
-export class UpdateRoleInput extends PartialType(CreateRoleInput) {
+export class UpdateRoleInput {
   @Field(() => ID)
+  @Matches(KEY_REGEX)
+  @IsString()
   _key: string;
 
   @Field(() => String, { nullable: true })
-  @Matches(/^[\w]+([\s][\w]+)*$/)
+  @Matches(NAME_REGEX)
   @IsString()
   @IsOptional()
   name?: string;
@@ -24,7 +30,7 @@ export class UpdateRoleInput extends PartialType(CreateRoleInput) {
   active?: boolean;
 
   @HideField()
-  @Matches(/^Roles\/[\w]+$/)
+  @Matches(UPDATED_REGEX)
   @IsString()
   updatedBy: string;
 

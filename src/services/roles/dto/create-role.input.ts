@@ -1,13 +1,20 @@
 import { InputType, ID, Field, HideField } from '@nestjs/graphql';
-import { IsBoolean, IsString, Matches } from 'class-validator';
+import { IsBoolean, IsString, Matches, IsOptional } from 'class-validator';
+import {
+  KEY_REGEX,
+  NAME_REGEX,
+  CREATED_REGEX,
+} from '../../../commons/commons.constants';
 
 @InputType()
 export class CreateRoleInput {
   @Field(() => ID, { nullable: true })
+  @Matches(KEY_REGEX)
+  @IsOptional()
   _key?: string;
 
   @Field(() => String)
-  @Matches(/^[\w]+([\s][\w]+)*$/)
+  @Matches(NAME_REGEX)
   @IsString()
   name: string;
 
@@ -20,7 +27,10 @@ export class CreateRoleInput {
   active: boolean;
 
   @HideField()
-  @Matches(/^Roles\/[\w]+$/)
+  deleted = false;
+
+  @HideField()
+  @Matches(CREATED_REGEX)
   @IsString()
   createdBy: string;
 
@@ -28,8 +38,14 @@ export class CreateRoleInput {
   updatedBy = '';
 
   @HideField()
+  deletedBy = '';
+
+  @HideField()
   createdAt = new Date().toISOString();
 
   @HideField()
   updatedAt = '';
+
+  @HideField()
+  deletedAt = '';
 }

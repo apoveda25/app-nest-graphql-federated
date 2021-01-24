@@ -1,10 +1,16 @@
 import { InputType, Field, ID, HideField } from '@nestjs/graphql';
 import { IsString, IsEmail, IsOptional, Matches } from 'class-validator';
+import { UPDATED_REGEX } from '../../../commons/commons.constants';
+import {
+  KEY_REGEX,
+  WORD_REGEX,
+  NAME_REGEX,
+} from '../../../commons/commons.constants';
 
 @InputType()
 export class UpdateUserInput {
   @Field(() => ID)
-  @Matches(/^[\w]+$/)
+  @Matches(KEY_REGEX)
   @IsString()
   _key: string;
 
@@ -14,25 +20,25 @@ export class UpdateUserInput {
   email?: string;
 
   @Field(() => String, { nullable: true })
-  @Matches(/^[\w]+$/)
+  @Matches(WORD_REGEX)
   @IsString()
   @IsOptional()
   username?: string;
 
   @Field(() => String, { nullable: true })
-  @Matches(/^[\w]+(\s[\w]+)*$/)
+  @Matches(NAME_REGEX)
   @IsString()
   @IsOptional()
   name?: string;
 
   @Field(() => String, { nullable: true })
-  @Matches(/^[\w]+(\s[\w]+)*$/)
+  @Matches(NAME_REGEX)
   @IsString()
   @IsOptional()
   surname?: string;
 
   @HideField()
-  @Matches(/^Users\/[\w]+$/)
+  @Matches(UPDATED_REGEX)
   @IsString()
   updatedBy: string;
 

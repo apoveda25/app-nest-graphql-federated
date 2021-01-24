@@ -8,6 +8,11 @@ import {
 import { Transform } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { IsBoolean } from 'class-validator';
+import { CREATED_REGEX } from '../../../commons/commons.constants';
+import {
+  CODE_SIX_DIGITS_REGEX,
+  WORD_REGEX,
+} from '../../../commons/commons.constants';
 
 export class CreateUserHash {
   @Matches(/^[\w]+$/)
@@ -21,10 +26,10 @@ export class CreateUserHash {
   @IsBoolean()
   emailActive: boolean;
 
-  @Matches(/^[\d]{6}$/)
+  @Matches(CODE_SIX_DIGITS_REGEX)
   emailCode: string;
 
-  @Matches(/^[\w]+$/)
+  @Matches(WORD_REGEX)
   @IsString()
   username: string;
 
@@ -40,17 +45,26 @@ export class CreateUserHash {
   @IsBoolean()
   active: boolean;
 
+  @IsBoolean()
+  deleted: boolean;
+
   @IsString()
-  @Matches(/^Users\/[\w]+$/)
+  @Matches(CREATED_REGEX)
   @IsString()
   createdBy: string;
 
   @IsString()
   updatedBy: string;
 
+  @IsString()
+  deletedBy: string;
+
   @IsDateString()
   createdAt: string;
 
   @IsString()
   updatedAt: string;
+
+  @IsString()
+  deletedAt: string;
 }

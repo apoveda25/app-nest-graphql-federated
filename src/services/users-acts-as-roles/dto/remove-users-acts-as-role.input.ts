@@ -1,10 +1,12 @@
 import { InputType, Field, ID, HideField } from '@nestjs/graphql';
 import { Matches, IsString } from 'class-validator';
+import { DELETED_REGEX } from '../../../commons/commons.constants';
+import { USERS_ACTS_AS_ROLES_ID_REGEX } from '../users-acts-as-roles.contants';
 
 @InputType()
 export class RemoveUsersActsAsRoleInput {
   @Field(() => ID)
-  @Matches(/^UsersActsAsRoles\/[\w]+$/)
+  @Matches(USERS_ACTS_AS_ROLES_ID_REGEX)
   @IsString()
   _id: string;
 
@@ -12,7 +14,7 @@ export class RemoveUsersActsAsRoleInput {
   deleted = true;
 
   @HideField()
-  @Matches(/^Users\/[\w]+$/)
+  @Matches(DELETED_REGEX)
   @IsString()
   deletedBy: string;
 

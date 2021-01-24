@@ -17,8 +17,6 @@ import { FilterRoleInput } from './dto/filter-role.input';
 import { SortRoleInput } from './dto/sort-role.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveRoleInput } from './dto/remove-role.input';
-import { RolesCreatePipe } from './pipes/roles-create.pipe';
-import { RolesUpdatePipe } from './pipes/roles-update.pipe';
 import { Permission } from '../../authorization/permission';
 import {
   IFilterToAQL,
@@ -26,13 +24,16 @@ import {
 } from '../../database/arangodb/object-to-aql.interface';
 import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
 import { Authorization } from '../../authorization/authorization.decorator';
+import { CreateResourcePipe } from '../../commons/pipes/create-resource.pipe';
+import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
+import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
 
 @Resolver(() => Role)
 export class RolesResolver {
   constructor(private readonly rolesService: RolesService) {}
 
   @Mutation(() => [Role])
-  @UsePipes(RolesCreatePipe)
+  @UsePipes(CreateResourcePipe)
   @Authorization(Permission.RolesCreate)
   createRoles(
     @Args(
@@ -80,7 +81,7 @@ export class RolesResolver {
   }
 
   @Mutation(() => [Role])
-  @UsePipes(RolesUpdatePipe)
+  @UsePipes(UpdateResourcePipe)
   @Authorization(Permission.RolesUpdate)
   updateRoles(
     @Args(
@@ -93,6 +94,7 @@ export class RolesResolver {
   }
 
   @Mutation(() => [Role])
+  @UsePipes(RemoveResourcePipe)
   @Authorization(Permission.RolesRemove)
   removeRoles(
     @Args(

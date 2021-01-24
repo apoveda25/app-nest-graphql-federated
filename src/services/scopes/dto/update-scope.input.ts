@@ -1,13 +1,20 @@
 import { InputType, Field, ID, HideField } from '@nestjs/graphql';
 import { Matches, IsString, IsBoolean } from 'class-validator';
+import {
+  UPDATED_REGEX,
+  NAME_REGEX,
+  KEY_REGEX,
+} from '../../../commons/commons.constants';
 
 @InputType()
 export class UpdateScopeInput {
   @Field(() => ID)
+  @Matches(KEY_REGEX)
+  @IsString()
   _key: string;
 
   @Field(() => String)
-  @Matches(/^[\w]+([\s][\w]+)*$/)
+  @Matches(NAME_REGEX)
   @IsString()
   name: string;
 
@@ -20,7 +27,7 @@ export class UpdateScopeInput {
   active: boolean;
 
   @HideField()
-  @Matches(/^Scopes\/[\w]+$/)
+  @Matches(UPDATED_REGEX)
   @IsString()
   updatedBy: string;
 

@@ -17,21 +17,23 @@ import { FilterScopeInput } from './dto/filter-scope.input';
 import { SortScopeInput } from './dto/sort-scope.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveScopeInput } from './dto/remove-scope.input';
-import { ScopesCreatePipe } from './pipes/scopes-create.pipe';
 import { Permission } from '../../authorization/permission';
-import { ScopesUpdatePipe } from './pipes/scopes-update.pipe';
 import {
   IFilterToAQL,
   ISortToAQL,
 } from '../../database/arangodb/object-to-aql.interface';
 import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
 import { Authorization } from '../../authorization/authorization.decorator';
+import { CreateResourcePipe } from '../../commons/pipes/create-resource.pipe';
+import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
+import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
+
 @Resolver(() => Scope)
 export class ScopesResolver {
   constructor(private readonly scopesService: ScopesService) {}
 
   @Mutation(() => [Scope])
-  @UsePipes(ScopesCreatePipe)
+  @UsePipes(CreateResourcePipe)
   @Authorization(Permission.ScopesCreate)
   createScopes(
     @Args(
@@ -79,7 +81,7 @@ export class ScopesResolver {
   }
 
   @Mutation(() => [Scope])
-  @UsePipes(ScopesUpdatePipe)
+  @UsePipes(UpdateResourcePipe)
   @Authorization(Permission.ScopesUpdate)
   updateScopes(
     @Args(
@@ -92,6 +94,7 @@ export class ScopesResolver {
   }
 
   @Mutation(() => [Scope])
+  @UsePipes(RemoveResourcePipe)
   @Authorization(Permission.ScopesRemove)
   removeScopes(
     @Args(

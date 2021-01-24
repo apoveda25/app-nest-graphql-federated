@@ -20,21 +20,22 @@ import { FilterUserInput } from './dto/filter-user.input';
 import { SortUserInput } from './dto/sort-user.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { Permission } from '../../authorization/permission';
-import { UsersCreatePipe } from './pipes/users-create.pipe';
-import { UsersUpdatePipe } from './pipes/users-update.pipe';
 import {
   IFilterToAQL,
   ISortToAQL,
 } from '../../database/arangodb/object-to-aql.interface';
 import { InputsQueryPipe } from '../../commons/pipes/inputs-query.pipe';
 import { Authorization } from '../../authorization/authorization.decorator';
+import { CreateResourcePipe } from '../../commons/pipes/create-resource.pipe';
+import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
+import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
 
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Mutation(() => [User])
-  @UsePipes(UsersCreatePipe)
+  @UsePipes(CreateResourcePipe)
   @Authorization(Permission.UsersCreate)
   createUsers(
     @Args(
@@ -83,7 +84,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => [User])
-  @UsePipes(UsersUpdatePipe)
+  @UsePipes(UpdateResourcePipe)
   @Authorization(Permission.UsersUpdate)
   updateUsers(
     @Args(
@@ -96,6 +97,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => [User])
+  @UsePipes(RemoveResourcePipe)
   @Authorization(Permission.UsersRemove)
   removeUsers(
     @Args(
