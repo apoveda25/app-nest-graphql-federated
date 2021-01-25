@@ -61,6 +61,7 @@ export class UsersActsAsRolesRepository {
   }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
+      FILTER doc.deleted == false
       ${aql.join(this.objectToAQL.filtersToAql(filters, 'doc'))}
       ${aql.join(this.objectToAQL.sortToAql(sort, 'doc'))}
       ${this.objectToAQL.paginationToAql(pagination)}
@@ -74,6 +75,7 @@ export class UsersActsAsRolesRepository {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
+        FILTER doc.deleted == false
         ${aql.join(this.objectToAQL.filtersToAql(filters, 'doc'))}
         RETURN doc
       )
@@ -99,6 +101,9 @@ export class UsersActsAsRolesRepository {
   }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR vertex, edge IN OUTBOUND ${startVertexId} ${this._collection}
+      PRUNE edge.deleted == false
+      FILTER edge.deleted == false && FILTER vertex.deleted == false
+
       ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.objectToAQL.sortToAql(sortEdge, 'edge'))}
 
@@ -129,6 +134,9 @@ export class UsersActsAsRolesRepository {
   }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR vertex, edge IN INBOUND ${startVertexId} ${this._collection}
+      PRUNE edge.deleted == false
+      FILTER edge.deleted == false && FILTER vertex.deleted == false
+
       ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.objectToAQL.sortToAql(sortEdge, 'edge'))}
 
@@ -154,6 +162,9 @@ export class UsersActsAsRolesRepository {
     const cursor = await this.arangodbService.query(aql`
       COUNT(
         FOR vertex, edge IN OUTBOUND ${startVertexId} ${this._collection}
+        PRUNE edge.deleted == false
+        FILTER edge.deleted == false && FILTER vertex.deleted == false
+
         ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
 
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertex, 'vertex'))}
@@ -177,6 +188,9 @@ export class UsersActsAsRolesRepository {
     const cursor = await this.arangodbService.query(aql`
       COUNT(
         FOR vertex, edge IN INBOUND ${startVertexId} ${this._collection}
+        PRUNE edge.deleted == false
+        FILTER edge.deleted == false && FILTER vertex.deleted == false
+
         ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
 
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertex, 'vertex'))}

@@ -56,6 +56,7 @@ export class ScopesRepository {
   }): Promise<Scope[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
+      FILTER doc.deleted == false
       ${aql.join(this.objectToAQL.filtersToAql(filters, 'doc'))}
       ${aql.join(this.objectToAQL.sortToAql(sort, 'doc'))}
       ${this.objectToAQL.paginationToAql(pagination)}
@@ -69,6 +70,7 @@ export class ScopesRepository {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
+        FILTER doc.deleted == false
         ${aql.join(this.objectToAQL.filtersToAql(filters, 'doc'))}
         RETURN doc
       )
@@ -100,10 +102,14 @@ export class ScopesRepository {
   }): Promise<Scope[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
+      FILTER doc.deleted == false
       ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
       ${aql.join(this.objectToAQL.sortToAql(sortVertexInit, 'doc'))}
 
       FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(edgeCollection)}
+      PRUNE edge.deleted == false
+      FILTER edge.deleted == false && FILTER vertex.deleted == false
+
       ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.objectToAQL.sortToAql(sortEdge, 'edge'))}
 
@@ -133,11 +139,15 @@ export class ScopesRepository {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
+        FILTER doc.deleted == false
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
 
         FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(
           edgeCollection,
         )}
+        PRUNE edge.deleted == false
+        FILTER edge.deleted == false && FILTER vertex.deleted == false
+
         ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
 
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal, 'vertex'))}
