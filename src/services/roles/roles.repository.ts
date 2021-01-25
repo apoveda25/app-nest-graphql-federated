@@ -183,37 +183,17 @@ export class RolesRepository {
     return docs.map((doc) => doc.new);
   }
 
-  // async remove(documents: RemoveRoleInput[]): Promise<Role[]> {
-  //   const AuthorizationByRole = this.getCollection('AuthorizationByRole');
-  //   const PermissionsGranted = this.getCollection('PermissionsGranted');
-  //   const trx = await this.arangodbService.beginTransaction({
-  //     write: [this._collection],
-  //     read: [this._collection, PermissionsGranted, AuthorizationByRole],
-  //   });
+  async remove(documents: RemoveRoleInput[]): Promise<Role[]> {
+    const trx = await this.arangodbService.beginTransaction({
+      write: [this._collection],
+    });
 
-  //   const docs = await trx.step(() =>
-  //     this.arangodbService.query(aql`
-  //       FOR vertex, edge IN ANY ${PermissionsGranted}, ${AuthorizationByRole}
-  //       RETURN vertex
-  //     `),
-  //   );
+    const docs = await trx.step(() =>
+      this._collection.updateAll(documents, { returnNew: true }),
+    );
 
-  //   if (docs.reduce((acc: number, crr: number) => crr ?? acc + 1, 0)) {
-  //     await trx.abort();
-  //     throw new Error(ROLES_REMOVE_MESSAGE_ERROR);
-  //   }
+    await trx.commit();
 
-  //   const docsOld = await trx.step(() =>
-  //     this.arangodbService.query(aql`
-  //       FOR item IN ${documents}
-  //       LET doc = DOCUMENT(item._id)
-  //       REMOVE doc IN ${this._collection}
-  //       RETURN OLD
-  //     `),
-  //   );
-
-  //   await trx.commit();
-
-  //   return docsOld.map((doc) => doc);
-  // }
+    return docs.map((doc) => doc.new);
+  }
 }

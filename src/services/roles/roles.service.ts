@@ -43,7 +43,6 @@ export class RolesService {
   }
 
   async remove(documents: RemoveRoleInput[]): Promise<Role[]> {
-    // return this.rolesRepository.remove(documents);
-    return new Promise(() => documents);
+    return this.rolesRepository.remove(documents);
   }
 }

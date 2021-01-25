@@ -232,35 +232,16 @@ export class UsersActsAsRolesRepository {
   async remove(
     documents: RemoveUsersActsAsRoleInput[],
   ): Promise<UsersActsAsRole[]> {
-    const AuthorizationByRole = this.getCollection('AuthorizationByRole');
     const trx = await this.arangodbService.beginTransaction({
       write: [this._collection],
-      read: [this._collection, AuthorizationByRole],
     });
 
     const docs = await trx.step(() =>
-      this.arangodbService.query(aql`
-        FOR vertex, edge IN ANY ${AuthorizationByRole}
-        RETURN vertex
-      `),
-    );
-
-    if (docs.reduce((acc: number, crr: number) => crr ?? acc + 1, 0)) {
-      await trx.abort();
-      throw errorUsersActsAsRolesRemove;
-    }
-
-    const docsOld = await trx.step(() =>
-      this.arangodbService.query(aql`
-        FOR item IN ${documents}
-        LET doc = DOCUMENT(item._id)
-        REMOVE doc IN ${this._collection}
-        RETURN OLD
-      `),
+      this._collection.updateAll(documents, { returnNew: true }),
     );
 
     await trx.commit();
 
-    return docsOld.map((doc) => doc);
+    return docs.map((doc) => doc.new);
   }
 }

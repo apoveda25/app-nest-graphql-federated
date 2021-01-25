@@ -43,7 +43,6 @@ export class ScopesService {
   }
 
   async remove(documents: RemoveScopeInput[]): Promise<Scope[]> {
-    // return this.scopesRepository.remove(documents);
-    return new Promise(() => documents);
+    return this.scopesRepository.remove(documents);
   }
 }
