@@ -1,32 +1,25 @@
 import { ObjectType, Field, ID, HideField } from '@nestjs/graphql';
-import { Matches, IsOptional, IsString } from 'class-validator';
+import { User } from '../../users/entities/user.entity';
+import { Role } from '../../roles/entities/role.entity';
 
 @ObjectType()
 export class UsersActsAsRole {
-  @Field(() => ID, { nullable: true })
-  @Matches(/^[\w]+$/)
-  @IsOptional()
+  @Field(() => ID)
   _id: string;
 
-  @Field(() => ID, { nullable: true })
-  @Matches(/^[\w]+$/)
-  @IsOptional()
-  _key?: string;
-
   @Field(() => ID)
-  @Matches(/^Users\/[\w]+$/)
-  _from: string;
+  _key: string;
 
-  @Field(() => ID)
-  @Matches(/^Roles\/[\w]+$/)
-  _to: string;
+  @Field(() => User)
+  _from: User;
+
+  @Field(() => Role)
+  _to: Role;
 
   @HideField()
   deleted = false;
 
   @HideField()
-  @Matches(/^Users\/[\w]+$/)
-  @IsString()
   createdBy: string;
 
   @HideField()

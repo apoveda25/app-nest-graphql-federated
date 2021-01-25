@@ -6,6 +6,7 @@ import { UsersRepository } from './users.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { arangodbConfig } from '../../config/modules/arangodb.config';
 import { CommonsModule } from '../../commons/commons.module';
+import { UsersActsAsRolesModule } from '../users-acts-as-roles/users-acts-as-roles.module';
 
 @Module({
   imports: [
@@ -15,9 +16,9 @@ import { CommonsModule } from '../../commons/commons.module';
       useFactory: arangodbConfig,
     }),
     CommonsModule,
-    // forwardRef(() => AuthorizationByRoleModule),
+    forwardRef(() => UsersActsAsRolesModule),
   ],
   providers: [UsersResolver, UsersService, UsersRepository],
-  exports: [UsersResolver, UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}

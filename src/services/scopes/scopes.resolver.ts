@@ -27,10 +27,18 @@ import { Authorization } from '../../authorization/authorization.decorator';
 import { CreateResourcePipe } from '../../commons/pipes/create-resource.pipe';
 import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
 import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
+import { FilterRolesIsAllowedScopeInput } from '../roles-is-allowed-scopes/dto/filter-roles-is-allowed-scope.input';
+import { SortRolesIsAllowedScopeInput } from '../roles-is-allowed-scopes/dto/sort-roles-is-allowed-scope.input';
+import { FilterRoleInput } from '../roles/dto/filter-role.input';
+import { SortRoleInput } from '../roles/dto/sort-role.input';
+import { RolesIsAllowedScopesService } from '../roles-is-allowed-scopes/roles-is-allowed-scopes.service';
 
 @Resolver(() => Scope)
 export class ScopesResolver {
-  constructor(private readonly scopesService: ScopesService) {}
+  constructor(
+    private readonly scopesService: ScopesService,
+    private readonly rolesIsAllowedScopesService: RolesIsAllowedScopesService,
+  ) {}
 
   @Mutation(() => [Scope])
   @UsePipes(CreateResourcePipe)
@@ -106,44 +114,46 @@ export class ScopesResolver {
     return this.scopesService.remove(remove);
   }
 
-  // @ResolveField()
-  // async permissionsGranted(
-  //   @Parent() scope: Scope,
+  @ResolveField()
+  @UsePipes(InputsQueryPipe)
+  @Authorization(Permission.RolesIsAllowedScopesSearchInbound)
+  async isAllowedReverse(
+    @Parent() scope: Scope,
 
-  //   @Args('filtersEdge', {
-  //     type: () => FilterPermissionsGrantedInput,
-  //     nullable: true,
-  //   })
-  //   filtersEdge?: FilterPermissionsGrantedInput,
+    @Args('filtersEdge', {
+      type: () => FilterRolesIsAllowedScopeInput,
+      nullable: true,
+    })
+    filtersEdge?: IFilterToAQL[],
 
-  //   @Args('sortEdge', {
-  //     type: () => SortPermissionsGrantedInput,
-  //     nullable: true,
-  //   })
-  //   sortEdge?: SortPermissionsGrantedInput,
+    @Args('sortEdge', {
+      type: () => SortRolesIsAllowedScopeInput,
+      nullable: true,
+    })
+    sortEdge?: ISortToAQL[],
 
-  //   @Args('filtersVertex', {
-  //     type: () => FilterRoleInput,
-  //     nullable: true,
-  //   })
-  //   filtersVertex?: FilterRoleInput,
+    @Args('filtersVertex', {
+      type: () => FilterRoleInput,
+      nullable: true,
+    })
+    filtersVertex?: IFilterToAQL[],
 
-  //   @Args('sortVertex', {
-  //     type: () => SortRoleInput,
-  //     nullable: true,
-  //   })
-  //   sortVertex?: SortRoleInput,
+    @Args('sortVertex', {
+      type: () => SortRoleInput,
+      nullable: true,
+    })
+    sortVertex?: ISortToAQL[],
 
-  //   @Args('pagination', { type: () => PaginationInput, nullable: true })
-  //   pagination?: PaginationInput,
-  // ) {
-  //   return this.permissionsGrantedService.inboundOneLevel({
-  //     _id: scope._id,
-  //     filtersEdge,
-  //     sortEdge,
-  //     filtersVertex,
-  //     sortVertex,
-  //     pagination,
-  //   });
-  // }
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.rolesIsAllowedScopesService.searchAllInbound({
+      startVertexId: scope._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
+  }
 }

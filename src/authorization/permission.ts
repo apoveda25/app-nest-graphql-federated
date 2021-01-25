@@ -12,6 +12,8 @@ export enum Permission {
   UsersActsAsRolesFind = 'users_acts_as_roles_find',
   UsersActsAsRolesSearch = 'users_acts_as_roles_search',
   UsersActsAsRolesCount = 'users_acts_as_roles_count',
+  UsersActsAsRolesSearchOutbound = 'users_acts_as_roles_search_outbound',
+  UsersActsAsRolesSearchInbound = 'users_acts_as_roles_search_inbound',
 
   RolesCreate = 'roles_create',
   RolesUpdate = 'roles_update',
@@ -26,6 +28,8 @@ export enum Permission {
   RolesIsAllowedScopesFind = 'roles_is_allowed_scopes_find',
   RolesIsAllowedScopesSearch = 'roles_is_allowed_scopes_search',
   RolesIsAllowedScopesCount = 'roles_is_allowed_scopes_count',
+  RolesIsAllowedScopesSearchOutbound = 'roles_is_allowed_scopes_search_outbound',
+  RolesIsAllowedScopesSearchInbound = 'roles_is_allowed_scopes_search_inbound',
 
   ScopesCreate = 'scopes_create',
   ScopesUpdate = 'scopes_update',

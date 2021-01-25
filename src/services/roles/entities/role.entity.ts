@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-// import { AuthorizationByRole } from '../../authorization-by-role/entities/authorization-by-role.entity';
-// import { PermissionsGranted } from '../../permissions-granted/entities/permissions-granted.entity';
+import { UsersActsAsRole } from '../../users-acts-as-roles/entities/users-acts-as-role.entity';
+import { RolesIsAllowedScope } from '../../roles-is-allowed-scopes/entities/roles-is-allowed-scope.entity';
 
 @ObjectType()
 export class Role {
@@ -31,9 +31,9 @@ export class Role {
   @Field(() => String)
   updatedAt: string;
 
-  //   @Field(() => [AuthorizationByRole])
-  //   authorizationByRole: AuthorizationByRole[];
+  @Field(() => [UsersActsAsRole])
+  actsAsReverse: UsersActsAsRole[];
 
-  //   @Field(() => [PermissionsGranted])
-  //   permissionsGranted: PermissionsGranted[];
+  @Field(() => [RolesIsAllowedScope])
+  isAllowed: RolesIsAllowedScope[];
 }

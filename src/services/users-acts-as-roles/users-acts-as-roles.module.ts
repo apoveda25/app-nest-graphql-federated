@@ -22,5 +22,6 @@ import { CommonsModule } from '../../commons/commons.module';
     UsersActsAsRolesService,
     UsersActsAsRolesRepository,
   ],
+  exports: [UsersActsAsRolesService],
 })
 export class UsersActsAsRolesModule {}

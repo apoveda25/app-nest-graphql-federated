@@ -29,10 +29,18 @@ import { Authorization } from '../../authorization/authorization.decorator';
 import { CreateResourcePipe } from '../../commons/pipes/create-resource.pipe';
 import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
 import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
+import { FilterUsersActsAsRoleInput } from '../users-acts-as-roles/dto/filter-users-acts-as-role.input';
+import { SortUsersActsAsRoleInput } from '../users-acts-as-roles/dto/sort-users-acts-as-role.input';
+import { FilterRoleInput } from '../roles/dto/filter-role.input';
+import { SortRoleInput } from '../roles/dto/sort-role.input';
+import { UsersActsAsRolesService } from '../users-acts-as-roles/users-acts-as-roles.service';
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly usersActsAsRolesService: UsersActsAsRolesService,
+  ) {}
 
   @Mutation(() => [User])
   @UsePipes(CreateResourcePipe)
@@ -109,46 +117,48 @@ export class UsersResolver {
     return this.usersService.remove(remove);
   }
 
-  // @ResolveField()
-  // async actsAs(
-  //   @Parent() user: User,
+  @ResolveField()
+  @UsePipes(InputsQueryPipe)
+  @Authorization(Permission.UsersActsAsRolesSearchOutbound)
+  async actsAs(
+    @Parent() user: User,
 
-  //   @Args('filtersEdge', {
-  //     type: () => FilterAuthorizationByRoleInput,
-  //     nullable: true,
-  //   })
-  //   filtersEdge?: FilterAuthorizationByRoleInput,
+    @Args('filtersEdge', {
+      type: () => FilterUsersActsAsRoleInput,
+      nullable: true,
+    })
+    filtersEdge?: IFilterToAQL[],
 
-  //   @Args('sortEdge', {
-  //     type: () => SortAuthorizationByRoleInput,
-  //     nullable: true,
-  //   })
-  //   sortEdge?: SortAuthorizationByRoleInput,
+    @Args('sortEdge', {
+      type: () => SortUsersActsAsRoleInput,
+      nullable: true,
+    })
+    sortEdge?: ISortToAQL[],
 
-  //   @Args('filtersVertex', {
-  //     type: () => FilterRoleInput,
-  //     nullable: true,
-  //   })
-  //   filtersVertex?: FilterRoleInput,
+    @Args('filtersVertex', {
+      type: () => FilterRoleInput,
+      nullable: true,
+    })
+    filtersVertex?: IFilterToAQL[],
 
-  //   @Args('sortVertex', {
-  //     type: () => SortRoleInput,
-  //     nullable: true,
-  //   })
-  //   sortVertex?: SortRoleInput,
+    @Args('sortVertex', {
+      type: () => SortRoleInput,
+      nullable: true,
+    })
+    sortVertex?: ISortToAQL[],
 
-  //   @Args('pagination', { type: () => PaginationInput, nullable: true })
-  //   pagination?: PaginationInput,
-  // ) {
-  //   return this.authorizationByRoleService.outboundOneLevel({
-  //     _id: user._id,
-  //     filtersEdge,
-  //     sortEdge,
-  //     filtersVertex,
-  //     sortVertex,
-  //     pagination,
-  //   });
-  // }
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.usersActsAsRolesService.searchAllOutbound({
+      startVertexId: user._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
+  }
 
   @ResolveReference()
   resolveReference(reference: { __typename: string; _id: string }) {

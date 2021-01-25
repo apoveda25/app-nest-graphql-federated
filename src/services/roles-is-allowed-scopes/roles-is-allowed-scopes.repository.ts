@@ -82,76 +82,106 @@ export class RolesIsAllowedScopesRepository {
     return await cursor.reduce((acc: number, cur: number) => acc + cur, 0);
   }
 
-  async findAllTransversal({
-    edgeCollection,
-    direction,
-    filtersVertexInit,
-    sortVertexInit,
+  async searchAllOutbound({
+    startVertexId,
     filtersEdge,
     sortEdge,
-    filtersVertexFinal,
-    sortVertexFinal,
+    filtersVertex,
+    sortVertex,
     pagination = { offset: 0, count: 10 },
   }: {
-    edgeCollection: string;
-    direction: string;
-    filtersVertexInit?: IFilterToAQL[];
-    sortVertexInit?: ISortToAQL[];
+    startVertexId: string;
     filtersEdge?: IFilterToAQL[];
     sortEdge?: ISortToAQL[];
-    filtersVertexFinal?: IFilterToAQL[];
-    sortVertexFinal?: ISortToAQL[];
+    filtersVertex?: IFilterToAQL[];
+    sortVertex?: ISortToAQL[];
     pagination?: PaginationInput;
   }): Promise<RolesIsAllowedScope[]> {
     const cursor = await this.arangodbService.query(aql`
-      FOR doc IN ${this._collection}
-      ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
-      ${aql.join(this.objectToAQL.sortToAql(sortVertexInit, 'doc'))}
-
-      FOR vertex, edge IN ${direction} doc._id ${this.getCollection(
-      edgeCollection,
-    )}
+      FOR vertex, edge IN OUTBOUND ${startVertexId} ${this._collection}
       ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.objectToAQL.sortToAql(sortEdge, 'edge'))}
 
-      ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal, 'vertex'))}
-      ${aql.join(this.objectToAQL.sortToAql(sortVertexFinal, 'vertex'))}
+      ${aql.join(this.objectToAQL.filtersToAql(filtersVertex, 'vertex'))}
+      ${aql.join(this.objectToAQL.sortToAql(sortVertex, 'vertex'))}
 
       ${this.objectToAQL.paginationToAql(pagination)}
-      RETURN MERGE(doc, {${aql.literal(
-        edgeCollection,
-      )}: MERGE(edge, { _from: doc, _to: vertex })})
+      RETURN MERGE(edge, { _from: DOCUMENT(${startVertexId}), _to: vertex })
     `);
 
     return await cursor.map((el) => el);
   }
 
-  async countAllTransversal({
-    edgeCollection,
-    direction,
-    filtersVertexInit,
+  async searchAllInbound({
+    startVertexId,
     filtersEdge,
-    filtersVertexFinal,
+    sortEdge,
+    filtersVertex,
+    sortVertex,
+    pagination = { offset: 0, count: 10 },
   }: {
-    edgeCollection: string;
-    direction: string;
-    filtersVertexInit?: IFilterToAQL[];
+    startVertexId: string;
     filtersEdge?: IFilterToAQL[];
-    filtersVertexFinal?: IFilterToAQL[];
+    sortEdge?: ISortToAQL[];
+    filtersVertex?: IFilterToAQL[];
+    sortVertex?: ISortToAQL[];
+    pagination?: PaginationInput;
+  }): Promise<RolesIsAllowedScope[]> {
+    const cursor = await this.arangodbService.query(aql`
+      FOR vertex, edge IN INBOUND ${startVertexId} ${this._collection}
+      ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
+      ${aql.join(this.objectToAQL.sortToAql(sortEdge, 'edge'))}
+
+      ${aql.join(this.objectToAQL.filtersToAql(filtersVertex, 'vertex'))}
+      ${aql.join(this.objectToAQL.sortToAql(sortVertex, 'vertex'))}
+
+      ${this.objectToAQL.paginationToAql(pagination)}
+      RETURN MERGE(edge, { _from: vertex, _to: DOCUMENT(${startVertexId}) })
+    `);
+
+    return await cursor.map((el) => el);
+  }
+
+  async countAllOutbound({
+    startVertexId,
+    filtersEdge,
+    filtersVertex,
+  }: {
+    startVertexId: string;
+    filtersEdge?: IFilterToAQL[];
+    filtersVertex?: IFilterToAQL[];
   }): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
-      RETURN COUNT(
-        FOR doc IN ${this._collection}
-        ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
-
-        FOR vertex, edge IN ${direction} doc._id ${this.getCollection(
-      edgeCollection,
-    )}
+      COUNT(
+        FOR vertex, edge IN OUTBOUND ${startVertexId} ${this._collection}
         ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
 
-        ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal, 'vertex'))}
+        ${aql.join(this.objectToAQL.filtersToAql(filtersVertex, 'vertex'))}
 
-        RETURN doc
+        RETURN vertex
+      )
+    `);
+
+    return await cursor.reduce((acc: number, cur: number) => acc + cur, 0);
+  }
+
+  async countAllInbound({
+    startVertexId,
+    filtersEdge,
+    filtersVertex,
+  }: {
+    startVertexId: string;
+    filtersEdge?: IFilterToAQL[];
+    filtersVertex?: IFilterToAQL[];
+  }): Promise<number> {
+    const cursor = await this.arangodbService.query(aql`
+      COUNT(
+        FOR vertex, edge IN INBOUND ${startVertexId} ${this._collection}
+        ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
+
+        ${aql.join(this.objectToAQL.filtersToAql(filtersVertex, 'vertex'))}
+
+        RETURN vertex
       )
     `);
 

@@ -27,10 +27,24 @@ import { Authorization } from '../../authorization/authorization.decorator';
 import { CreateResourcePipe } from '../../commons/pipes/create-resource.pipe';
 import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
 import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
+import { FilterUsersActsAsRoleInput } from '../users-acts-as-roles/dto/filter-users-acts-as-role.input';
+import { SortUsersActsAsRoleInput } from '../users-acts-as-roles/dto/sort-users-acts-as-role.input';
+import { FilterUserInput } from '../users/dto/filter-user.input';
+import { SortUserInput } from '../users/dto/sort-user.input';
+import { UsersActsAsRolesService } from '../users-acts-as-roles/users-acts-as-roles.service';
+import { FilterRolesIsAllowedScopeInput } from '../roles-is-allowed-scopes/dto/filter-roles-is-allowed-scope.input';
+import { SortRolesIsAllowedScopeInput } from '../roles-is-allowed-scopes/dto/sort-roles-is-allowed-scope.input';
+import { FilterScopeInput } from '../scopes/dto/filter-scope.input';
+import { SortScopeInput } from '../scopes/dto/sort-scope.input';
+import { RolesIsAllowedScopesService } from '../roles-is-allowed-scopes/roles-is-allowed-scopes.service';
 
 @Resolver(() => Role)
 export class RolesResolver {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(
+    private readonly rolesService: RolesService,
+    private readonly usersActsAsRolesService: UsersActsAsRolesService,
+    private readonly rolesIsAllowedService: RolesIsAllowedScopesService,
+  ) {}
 
   @Mutation(() => [Role])
   @UsePipes(CreateResourcePipe)
@@ -106,85 +120,89 @@ export class RolesResolver {
     return this.rolesService.remove(remove);
   }
 
-  // @ResolveField()
-  // async authorizationByRole(
-  //   @Parent() role: Role,
+  @ResolveField()
+  @UsePipes(InputsQueryPipe)
+  @Authorization(Permission.UsersActsAsRolesSearchInbound)
+  async actsAsReverse(
+    @Parent() role: Role,
 
-  //   @Args('filtersEdge', {
-  //     type: () => FilterAuthorizationByRoleInput,
-  //     nullable: true,
-  //   })
-  //   filtersEdge?: FilterAuthorizationByRoleInput,
+    @Args('filtersEdge', {
+      type: () => FilterUsersActsAsRoleInput,
+      nullable: true,
+    })
+    filtersEdge?: IFilterToAQL[],
 
-  //   @Args('sortEdge', {
-  //     type: () => SortAuthorizationByRoleInput,
-  //     nullable: true,
-  //   })
-  //   sortEdge?: SortAuthorizationByRoleInput,
+    @Args('sortEdge', {
+      type: () => SortUsersActsAsRoleInput,
+      nullable: true,
+    })
+    sortEdge?: ISortToAQL[],
 
-  //   @Args('filtersVertex', {
-  //     type: () => FilterUserInput,
-  //     nullable: true,
-  //   })
-  //   filtersVertex?: FilterUserInput,
+    @Args('filtersVertex', {
+      type: () => FilterUserInput,
+      nullable: true,
+    })
+    filtersVertex?: IFilterToAQL[],
 
-  //   @Args('sortVertex', {
-  //     type: () => SortUserInput,
-  //     nullable: true,
-  //   })
-  //   sortVertex?: SortUserInput,
+    @Args('sortVertex', {
+      type: () => SortUserInput,
+      nullable: true,
+    })
+    sortVertex?: ISortToAQL[],
 
-  //   @Args('pagination', { type: () => PaginationInput, nullable: true })
-  //   pagination?: PaginationInput,
-  // ) {
-  //   return this.authorizationByRoleService.inboundOneLevel({
-  //     _id: role._id,
-  //     filtersEdge,
-  //     sortEdge,
-  //     filtersVertex,
-  //     sortVertex,
-  //     pagination,
-  //   });
-  // }
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.usersActsAsRolesService.searchAllOutbound({
+      startVertexId: role._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
+  }
 
-  // @ResolveField()
-  // async permissionsGranted(
-  //   @Parent() role: Role,
+  @ResolveField()
+  @UsePipes(InputsQueryPipe)
+  @Authorization(Permission.RolesIsAllowedScopesSearchOutbound)
+  async isAllowed(
+    @Parent() role: Role,
 
-  //   @Args('filtersEdge', {
-  //     type: () => FilterPermissionsGrantedInput,
-  //     nullable: true,
-  //   })
-  //   filtersEdge?: FilterPermissionsGrantedInput,
+    @Args('filtersEdge', {
+      type: () => FilterRolesIsAllowedScopeInput,
+      nullable: true,
+    })
+    filtersEdge?: IFilterToAQL[],
 
-  //   @Args('sortEdge', {
-  //     type: () => SortPermissionsGrantedInput,
-  //     nullable: true,
-  //   })
-  //   sortEdge?: SortPermissionsGrantedInput,
+    @Args('sortEdge', {
+      type: () => SortRolesIsAllowedScopeInput,
+      nullable: true,
+    })
+    sortEdge?: ISortToAQL[],
 
-  //   @Args('filtersVertex', {
-  //     type: () => FilterScopeInput,
-  //     nullable: true,
-  //   })
-  //   filtersVertex?: FilterScopeInput,
+    @Args('filtersVertex', {
+      type: () => FilterScopeInput,
+      nullable: true,
+    })
+    filtersVertex?: IFilterToAQL[],
 
-  //   @Args('sortVertex', {
-  //     type: () => SortScopeInput,
-  //     nullable: true,
-  //   })
-  //   sortVertex?: SortScopeInput,
+    @Args('sortVertex', {
+      type: () => SortScopeInput,
+      nullable: true,
+    })
+    sortVertex?: ISortToAQL[],
 
-  //   @Args('pagination', { type: () => PaginationInput, nullable: true })
-  //   pagination?: PaginationInput,
-  // ) {
-  //   return this.permissionsGrantedService.outboundOneLevel({
-  //     _id: role._id,
-  //     filtersEdge,
-  //     sortEdge,
-  //     filtersVertex,
-  //     sortVertex,
-  //     pagination,
-  //   });
-  // }
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.rolesIsAllowedService.searchAllOutbound({
+      startVertexId: role._id,
+      filtersEdge,
+      sortEdge,
+      filtersVertex,
+      sortVertex,
+      pagination,
+    });
+  }
 }

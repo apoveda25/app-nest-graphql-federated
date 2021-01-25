@@ -2,26 +2,25 @@ import { forwardRef, Module } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RolesResolver } from './roles.resolver';
 import { DatabaseModule } from '../../database/database.module';
-// import { AuthorizationByRoleModule } from '../authorization-by-role/authorization-by-role.module';
-// import { PermissionsGrantedModule } from '../permissions-granted/permissions-granted.module';
 import { RolesRepository } from './roles.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { arangodbConfig } from '../../config/modules/arangodb.config';
 import { CommonsModule } from '../../commons/commons.module';
+import { UsersActsAsRolesModule } from '../users-acts-as-roles/users-acts-as-roles.module';
+import { RolesIsAllowedScopesModule } from '../roles-is-allowed-scopes/roles-is-allowed-scopes.module';
 
 @Module({
   imports: [
-    // DatabaseModule.forRootAsync({ useClass: ArangoDBConfig }),
     DatabaseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: arangodbConfig,
     }),
     CommonsModule,
-    // forwardRef(() => AuthorizationByRoleModule),
-    // forwardRef(() => PermissionsGrantedModule),
+    forwardRef(() => UsersActsAsRolesModule),
+    forwardRef(() => RolesIsAllowedScopesModule),
   ],
   providers: [RolesResolver, RolesService, RolesRepository],
-  exports: [RolesResolver, RolesService],
+  exports: [RolesService],
 })
 export class RolesModule {}

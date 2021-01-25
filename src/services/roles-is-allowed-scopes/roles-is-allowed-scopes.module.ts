@@ -15,12 +15,12 @@ import { CommonsModule } from '../../commons/commons.module';
       useFactory: arangodbConfig,
     }),
     CommonsModule,
-    // forwardRef(() => AuthorizationByRoleModule),
   ],
   providers: [
     RolesIsAllowedScopesResolver,
     RolesIsAllowedScopesService,
     RolesIsAllowedScopesRepository,
   ],
+  exports: [RolesIsAllowedScopesService],
 })
 export class RolesIsAllowedScopesModule {}

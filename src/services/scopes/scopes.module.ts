@@ -2,11 +2,11 @@ import { forwardRef, Module } from '@nestjs/common';
 import { ScopesService } from './scopes.service';
 import { ScopesResolver } from './scopes.resolver';
 import { DatabaseModule } from '../../database/database.module';
-// import { PermissionsGrantedModule } from '../permissions-granted/permissions-granted.module';
 import { ScopesRepository } from './scopes.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { arangodbConfig } from '../../config/modules/arangodb.config';
 import { CommonsModule } from '../../commons/commons.module';
+import { RolesIsAllowedScopesModule } from '../roles-is-allowed-scopes/roles-is-allowed-scopes.module';
 
 @Module({
   imports: [
@@ -16,9 +16,9 @@ import { CommonsModule } from '../../commons/commons.module';
       useFactory: arangodbConfig,
     }),
     CommonsModule,
-    // forwardRef(() => PermissionsGrantedModule),
+    forwardRef(() => RolesIsAllowedScopesModule),
   ],
   providers: [ScopesResolver, ScopesService, ScopesRepository],
-  exports: [ScopesResolver, ScopesService],
+  exports: [ScopesService],
 })
 export class ScopesModule {}
