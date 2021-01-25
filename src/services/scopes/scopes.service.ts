@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateScopeInput } from './dto/create-scope.input';
 import { UpdateScopeInput } from './dto/update-scope.input';
 import { Scope } from './entities/scope.entity';
-import { FilterScopeInput } from './dto/filter-scope.input';
 import { PaginationInput } from '../../commons/pagination.input';
 import { RemoveScopeInput } from './dto/remove-scope.input';
 import { ScopesRepository } from './scopes.repository';
@@ -24,14 +23,14 @@ export class ScopesService {
     sort,
     pagination = { offset: 0, count: 10 },
   }: {
-    filters?: IFilterToAQL[];
-    sort?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filters: IFilterToAQL[];
+    sort: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<Scope[]> {
     return this.scopesRepository.findAll({ filters, sort, pagination });
   }
 
-  async countAll(filters?: IFilterToAQL[]): Promise<number> {
+  async countAll(filters: IFilterToAQL[]): Promise<number> {
     return this.scopesRepository.countAll(filters);
   }
 

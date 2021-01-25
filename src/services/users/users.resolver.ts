@@ -34,6 +34,11 @@ import { SortUsersActsAsRoleInput } from '../users-acts-as-roles/dto/sort-users-
 import { FilterRoleInput } from '../roles/dto/filter-role.input';
 import { SortRoleInput } from '../roles/dto/sort-role.input';
 import { UsersActsAsRolesService } from '../users-acts-as-roles/users-acts-as-roles.service';
+import {
+  FILTER_DEFAULT,
+  SORT_DEFAULT,
+  PAGINATION_DEFAULT,
+} from '../../commons/commons.constants';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -63,14 +68,23 @@ export class UsersResolver {
   @UsePipes(InputsQueryPipe)
   @Authorization(Permission.UsersSearch)
   searchUsers(
-    @Args('filters', { type: () => FilterUserInput, nullable: true })
-    filters?: IFilterToAQL[],
+    @Args('filters', {
+      type: () => FilterUserInput,
+      nullable: true,
+    })
+    filters: IFilterToAQL[] = FILTER_DEFAULT,
 
-    @Args('sort', { type: () => SortUserInput, nullable: true })
-    sort?: ISortToAQL[],
+    @Args('sort', {
+      type: () => SortUserInput,
+      nullable: true,
+    })
+    sort: ISortToAQL[] = SORT_DEFAULT,
 
-    @Args('pagination', { type: () => PaginationInput, nullable: true })
-    pagination?: PaginationInput,
+    @Args('pagination', {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    pagination: PaginationInput = PAGINATION_DEFAULT,
   ) {
     return this.usersService.findAll({ filters, sort, pagination });
   }
@@ -80,7 +94,7 @@ export class UsersResolver {
   @Authorization(Permission.UsersCount)
   countUsers(
     @Args('filters', { type: () => FilterUserInput, nullable: true })
-    filters?: IFilterToAQL[],
+    filters: IFilterToAQL[] = FILTER_DEFAULT,
   ) {
     return this.usersService.countAll(filters);
   }
@@ -118,37 +132,52 @@ export class UsersResolver {
   }
 
   @ResolveField()
-  @UsePipes(InputsQueryPipe)
   @Authorization(Permission.UsersActsAsRolesSearchOutbound)
   async actsAs(
     @Parent() user: User,
 
-    @Args('filtersEdge', {
-      type: () => FilterUsersActsAsRoleInput,
-      nullable: true,
-    })
-    filtersEdge?: IFilterToAQL[],
+    @Args(
+      'filtersEdge',
+      {
+        type: () => FilterUsersActsAsRoleInput,
+        nullable: true,
+      },
+      InputsQueryPipe,
+    )
+    filtersEdge: IFilterToAQL[] = FILTER_DEFAULT,
 
-    @Args('sortEdge', {
-      type: () => SortUsersActsAsRoleInput,
-      nullable: true,
-    })
-    sortEdge?: ISortToAQL[],
+    @Args(
+      'sortEdge',
+      {
+        type: () => SortUsersActsAsRoleInput,
+        nullable: true,
+      },
+      InputsQueryPipe,
+    )
+    sortEdge: ISortToAQL[] = SORT_DEFAULT,
 
-    @Args('filtersVertex', {
-      type: () => FilterRoleInput,
-      nullable: true,
-    })
-    filtersVertex?: IFilterToAQL[],
+    @Args(
+      'filtersVertex',
+      {
+        type: () => FilterRoleInput,
+        nullable: true,
+      },
+      InputsQueryPipe,
+    )
+    filtersVertex: IFilterToAQL[] = FILTER_DEFAULT,
 
-    @Args('sortVertex', {
-      type: () => SortRoleInput,
-      nullable: true,
-    })
-    sortVertex?: ISortToAQL[],
+    @Args(
+      'sortVertex',
+      {
+        type: () => SortRoleInput,
+        nullable: true,
+      },
+      InputsQueryPipe,
+    )
+    sortVertex: ISortToAQL[] = SORT_DEFAULT,
 
     @Args('pagination', { type: () => PaginationInput, nullable: true })
-    pagination?: PaginationInput,
+    pagination: PaginationInput = PAGINATION_DEFAULT,
   ) {
     return this.usersActsAsRolesService.searchAllOutbound({
       startVertexId: user._id,

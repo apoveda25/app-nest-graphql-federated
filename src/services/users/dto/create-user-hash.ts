@@ -8,14 +8,15 @@ import {
 import { Transform } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { IsBoolean } from 'class-validator';
-import { CREATED_REGEX } from '../../../commons/commons.constants';
+import { CREATED_REGEX, KEY_REGEX } from '../../../commons/commons.constants';
 import {
   CODE_SIX_DIGITS_REGEX,
   WORD_REGEX,
 } from '../../../commons/commons.constants';
 
 export class CreateUserHash {
-  @Matches(/^[\w]+$/)
+  @Matches(KEY_REGEX)
+  @IsString()
   @IsOptional()
   _key?: string;
 

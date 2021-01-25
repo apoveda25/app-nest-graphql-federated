@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationInput } from 'src/commons/pagination.input';
 import { CreateRoleInput } from './dto/create-role.input';
-import { FilterRoleInput } from './dto/filter-role.input';
 import { RemoveRoleInput } from './dto/remove-role.input';
-import { SortRoleInput } from './dto/sort-role.input';
 import { UpdateRoleInput } from './dto/update-role.input';
 import { Role } from './entities/role.entity';
 import { RolesRepository } from './roles.repository';
@@ -23,16 +21,16 @@ export class RolesService {
   async findAll({
     filters,
     sort,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
-    filters?: IFilterToAQL[];
-    sort?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filters: IFilterToAQL[];
+    sort: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<Role[]> {
     return this.rolesRepository.findAll({ filters, sort, pagination });
   }
 
-  async countAll(filters?: IFilterToAQL[]): Promise<number> {
+  async countAll(filters: IFilterToAQL[]): Promise<number> {
     return this.countAll(filters);
   }
 

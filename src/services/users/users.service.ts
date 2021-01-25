@@ -19,16 +19,16 @@ export class UsersService {
   async findAll({
     filters,
     sort,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
-    filters?: IFilterToAQL[];
-    sort?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filters: IFilterToAQL[];
+    sort: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<User[]> {
     return this.usersRepository.findAll({ filters, sort, pagination });
   }
 
-  async countAll(filters?: IFilterToAQL[]): Promise<number> {
+  async countAll(filters: IFilterToAQL[]): Promise<number> {
     return this.usersRepository.countAll(filters);
   }
 

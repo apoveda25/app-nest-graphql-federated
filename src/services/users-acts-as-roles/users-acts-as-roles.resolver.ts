@@ -18,6 +18,11 @@ import { PaginationInput } from '../../commons/pagination.input';
 import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
 import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
 import { RemoveUsersActsAsRoleInput } from './dto/remove-users-acts-as-role.input';
+import {
+  FILTER_DEFAULT,
+  SORT_DEFAULT,
+  PAGINATION_DEFAULT,
+} from '../../commons/commons.constants';
 
 @Resolver(() => UsersActsAsRole)
 export class UsersActsAsRolesResolver {
@@ -43,13 +48,13 @@ export class UsersActsAsRolesResolver {
   @Authorization(Permission.UsersActsAsRolesSearch)
   searchUsersActsAsRoles(
     @Args('filters', { type: () => FilterUsersActsAsRoleInput, nullable: true })
-    filters?: IFilterToAQL[],
+    filters: IFilterToAQL[] = FILTER_DEFAULT,
 
     @Args('sort', { type: () => SortUsersActsAsRoleInput, nullable: true })
-    sort?: ISortToAQL[],
+    sort: ISortToAQL[] = SORT_DEFAULT,
 
     @Args('pagination', { type: () => PaginationInput, nullable: true })
-    pagination?: PaginationInput,
+    pagination: PaginationInput = PAGINATION_DEFAULT,
   ) {
     return this.usersActsAsRolesService.findAll({ filters, sort, pagination });
   }
@@ -59,7 +64,7 @@ export class UsersActsAsRolesResolver {
   @Authorization(Permission.UsersActsAsRolesCount)
   countUsersActsAsRoles(
     @Args('filters', { type: () => FilterUsersActsAsRoleInput, nullable: true })
-    filters?: IFilterToAQL[],
+    filters: IFilterToAQL[] = FILTER_DEFAULT,
   ) {
     return this.usersActsAsRolesService.countAll(filters);
   }

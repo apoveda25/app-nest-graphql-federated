@@ -18,6 +18,11 @@ import { PaginationInput } from '../../commons/pagination.input';
 import { UpdateResourcePipe } from '../../commons/pipes/update-resource.pipe';
 import { RemoveResourcePipe } from '../../commons/pipes/remove-resource.pipe';
 import { RemoveRolesIsAllowedScopeInput } from './dto/remove-roles-is-allowed-scope.input';
+import {
+  FILTER_DEFAULT,
+  SORT_DEFAULT,
+  PAGINATION_DEFAULT,
+} from '../../commons/commons.constants';
 
 @Resolver(() => RolesIsAllowedScope)
 export class RolesIsAllowedScopesResolver {
@@ -49,13 +54,13 @@ export class RolesIsAllowedScopesResolver {
       type: () => FilterRolesIsAllowedScopeInput,
       nullable: true,
     })
-    filters?: IFilterToAQL[],
+    filters: IFilterToAQL[] = FILTER_DEFAULT,
 
     @Args('sort', { type: () => SortRolesIsAllowedScopeInput, nullable: true })
-    sort?: ISortToAQL[],
+    sort: ISortToAQL[] = SORT_DEFAULT,
 
     @Args('pagination', { type: () => PaginationInput, nullable: true })
-    pagination?: PaginationInput,
+    pagination: PaginationInput = PAGINATION_DEFAULT,
   ) {
     return this.rolesIsAllowedScopesService.findAll({
       filters,
@@ -72,7 +77,7 @@ export class RolesIsAllowedScopesResolver {
       type: () => FilterRolesIsAllowedScopeInput,
       nullable: true,
     })
-    filters?: IFilterToAQL[],
+    filters: IFilterToAQL[] = FILTER_DEFAULT,
   ) {
     return this.rolesIsAllowedScopesService.countAll(filters);
   }

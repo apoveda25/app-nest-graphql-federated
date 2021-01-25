@@ -5,10 +5,7 @@ import { ObjectToAQL } from '../../database/arangodb/object-to-aql';
 import { CreateScopeInput } from './dto/create-scope.input';
 import { Scope } from './entities/scope.entity';
 import { PaginationInput } from '../../commons/pagination.input';
-import {
-  SCOPES_REMOVE_MESSAGE_ERROR,
-  SCOPES_COLLECTION,
-} from './scopes.contants';
+import { SCOPES_COLLECTION } from './scopes.contants';
 import { aql } from 'arangojs';
 import { UpdateScopeInput } from './dto/update-scope.input';
 import { RemoveScopeInput } from './dto/remove-scope.input';
@@ -51,11 +48,11 @@ export class ScopesRepository {
   async findAll({
     filters,
     sort,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
-    filters?: IFilterToAQL[];
-    sort?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filters: IFilterToAQL[];
+    sort: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<Scope[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
@@ -68,7 +65,7 @@ export class ScopesRepository {
     return await cursor.map((el) => el);
   }
 
-  async countAll(filters?: IFilterToAQL[]): Promise<number> {
+  async countAll(filters: IFilterToAQL[]): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
@@ -80,35 +77,33 @@ export class ScopesRepository {
     return await cursor.reduce((acc: number, cur: number) => acc + cur, 0);
   }
 
-  async findAllTransversal({
+  async findAllOutbound({
     edgeCollection,
-    direction,
+    fieldOfResolution,
     filtersVertexInit,
     sortVertexInit,
     filtersEdge,
     sortEdge,
     filtersVertexFinal,
     sortVertexFinal,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
     edgeCollection: string;
-    direction: string;
-    filtersVertexInit?: IFilterToAQL[];
-    sortVertexInit?: ISortToAQL[];
-    filtersEdge?: IFilterToAQL[];
-    sortEdge?: ISortToAQL[];
-    filtersVertexFinal?: IFilterToAQL[];
-    sortVertexFinal?: ISortToAQL[];
-    pagination?: PaginationInput;
+    fieldOfResolution: string;
+    filtersVertexInit: IFilterToAQL[];
+    sortVertexInit: ISortToAQL[];
+    filtersEdge: IFilterToAQL[];
+    sortEdge: ISortToAQL[];
+    filtersVertexFinal: IFilterToAQL[];
+    sortVertexFinal: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<Scope[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
       ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
       ${aql.join(this.objectToAQL.sortToAql(sortVertexInit, 'doc'))}
 
-      FOR vertex, edge IN ${direction} doc._id ${this.getCollection(
-      edgeCollection,
-    )}
+      FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(edgeCollection)}
       ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
       ${aql.join(this.objectToAQL.sortToAql(sortEdge, 'edge'))}
 
@@ -117,34 +112,32 @@ export class ScopesRepository {
 
       ${this.objectToAQL.paginationToAql(pagination)}
       RETURN MERGE(doc, {${aql.literal(
-        edgeCollection,
+        fieldOfResolution,
       )}: MERGE(edge, { _from: doc, _to: vertex })})
     `);
 
     return await cursor.map((el) => el);
   }
 
-  async countAllTransversal({
+  async countAllOutbound({
     edgeCollection,
-    direction,
     filtersVertexInit,
     filtersEdge,
     filtersVertexFinal,
   }: {
     edgeCollection: string;
-    direction: string;
-    filtersVertexInit?: IFilterToAQL[];
-    filtersEdge?: IFilterToAQL[];
-    filtersVertexFinal?: IFilterToAQL[];
+    filtersVertexInit: IFilterToAQL[];
+    filtersEdge: IFilterToAQL[];
+    filtersVertexFinal: IFilterToAQL[];
   }): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertexInit, 'doc'))}
 
-        FOR vertex, edge IN ${direction} doc._id ${this.getCollection(
-      edgeCollection,
-    )}
+        FOR vertex, edge IN OUTBOUND doc._id ${this.getCollection(
+          edgeCollection,
+        )}
         ${aql.join(this.objectToAQL.filtersToAql(filtersEdge, 'edge'))}
 
         ${aql.join(this.objectToAQL.filtersToAql(filtersVertexFinal, 'vertex'))}
@@ -159,6 +152,7 @@ export class ScopesRepository {
   async findOne(_key: string): Promise<Scope | unknown> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
+      FILTER doc.deleted == false
       FILTER doc._key == ${_key} || doc._id == ${_key}
       RETURN doc
     `);

@@ -53,11 +53,11 @@ export class UsersActsAsRolesRepository {
   async findAll({
     filters,
     sort,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
-    filters?: IFilterToAQL[];
-    sort?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filters: IFilterToAQL[];
+    sort: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
@@ -70,7 +70,7 @@ export class UsersActsAsRolesRepository {
     return await cursor.map((el) => el);
   }
 
-  async countAll(filters?: IFilterToAQL[]): Promise<number> {
+  async countAll(filters: IFilterToAQL[]): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       RETURN COUNT(
         FOR doc IN ${this._collection}
@@ -88,14 +88,14 @@ export class UsersActsAsRolesRepository {
     sortEdge,
     filtersVertex,
     sortVertex,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    sortEdge?: ISortToAQL[];
-    filtersVertex?: IFilterToAQL[];
-    sortVertex?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filtersEdge: IFilterToAQL[];
+    sortEdge: ISortToAQL[];
+    filtersVertex: IFilterToAQL[];
+    sortVertex: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR vertex, edge IN OUTBOUND ${startVertexId} ${this._collection}
@@ -118,14 +118,14 @@ export class UsersActsAsRolesRepository {
     sortEdge,
     filtersVertex,
     sortVertex,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    sortEdge?: ISortToAQL[];
-    filtersVertex?: IFilterToAQL[];
-    sortVertex?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filtersEdge: IFilterToAQL[];
+    sortEdge: ISortToAQL[];
+    filtersVertex: IFilterToAQL[];
+    sortVertex: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<UsersActsAsRole[]> {
     const cursor = await this.arangodbService.query(aql`
       FOR vertex, edge IN INBOUND ${startVertexId} ${this._collection}
@@ -148,8 +148,8 @@ export class UsersActsAsRolesRepository {
     filtersVertex,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    filtersVertex?: IFilterToAQL[];
+    filtersEdge: IFilterToAQL[];
+    filtersVertex: IFilterToAQL[];
   }): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       COUNT(
@@ -171,8 +171,8 @@ export class UsersActsAsRolesRepository {
     filtersVertex,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    filtersVertex?: IFilterToAQL[];
+    filtersEdge: IFilterToAQL[];
+    filtersVertex: IFilterToAQL[];
   }): Promise<number> {
     const cursor = await this.arangodbService.query(aql`
       COUNT(
@@ -191,6 +191,7 @@ export class UsersActsAsRolesRepository {
   async findOne(_key: string): Promise<UsersActsAsRole | unknown> {
     const cursor = await this.arangodbService.query(aql`
       FOR doc IN ${this._collection}
+      FILTER doc.deleted == false
       FILTER doc._key == ${_key} || doc._id == ${_key}
       RETURN doc
     `);

@@ -21,16 +21,16 @@ export class RolesIsAllowedScopesService {
   async findAll({
     filters,
     sort,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
-    filters?: IFilterToAQL[];
-    sort?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filters: IFilterToAQL[];
+    sort: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<RolesIsAllowedScope[]> {
     return this.repository.findAll({ filters, sort, pagination });
   }
 
-  async countAll(filters?: IFilterToAQL[]): Promise<number> {
+  async countAll(filters: IFilterToAQL[]): Promise<number> {
     return this.repository.countAll(filters);
   }
 
@@ -56,14 +56,14 @@ export class RolesIsAllowedScopesService {
     sortEdge,
     filtersVertex,
     sortVertex,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    sortEdge?: ISortToAQL[];
-    filtersVertex?: IFilterToAQL[];
-    sortVertex?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filtersEdge: IFilterToAQL[];
+    sortEdge: ISortToAQL[];
+    filtersVertex: IFilterToAQL[];
+    sortVertex: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<RolesIsAllowedScope[]> {
     return this.repository.searchAllOutbound({
       startVertexId,
@@ -81,14 +81,14 @@ export class RolesIsAllowedScopesService {
     sortEdge,
     filtersVertex,
     sortVertex,
-    pagination = { offset: 0, count: 10 },
+    pagination,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    sortEdge?: ISortToAQL[];
-    filtersVertex?: IFilterToAQL[];
-    sortVertex?: ISortToAQL[];
-    pagination?: PaginationInput;
+    filtersEdge: IFilterToAQL[];
+    sortEdge: ISortToAQL[];
+    filtersVertex: IFilterToAQL[];
+    sortVertex: ISortToAQL[];
+    pagination: PaginationInput;
   }): Promise<RolesIsAllowedScope[]> {
     return this.repository.searchAllInbound({
       startVertexId,
@@ -106,8 +106,8 @@ export class RolesIsAllowedScopesService {
     filtersVertex,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    filtersVertex?: IFilterToAQL[];
+    filtersEdge: IFilterToAQL[];
+    filtersVertex: IFilterToAQL[];
   }): Promise<number> {
     return this.repository.countAllOutbound({
       startVertexId,
@@ -122,8 +122,8 @@ export class RolesIsAllowedScopesService {
     filtersVertex,
   }: {
     startVertexId: string;
-    filtersEdge?: IFilterToAQL[];
-    filtersVertex?: IFilterToAQL[];
+    filtersEdge: IFilterToAQL[];
+    filtersVertex: IFilterToAQL[];
   }): Promise<number> {
     return this.repository.countAllInbound({
       startVertexId,
